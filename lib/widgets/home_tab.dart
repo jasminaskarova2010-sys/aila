@@ -1,38 +1,28 @@
 // lib/widgets/home_tab.dart
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../games/game_models.dart';
 import '../games/games_flow_screen.dart';
 import '../games/journey_titles_sheet.dart';
 import '../l10n/strings.dart';
 import '../pecs_screen.dart';
+import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
 import '../state/app_state.dart';
 
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
 
-  String _getUserDisplayName(S s) {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return s.defaultUserName;
-
-    if (user.displayName != null && user.displayName!.trim().isNotEmpty) {
-      return user.displayName!.split(' ').first;
-    }
-
-    if (user.email != null && user.email!.isNotEmpty) {
-      return user.email!.split('@').first;
-    }
-
-    return s.defaultUserName;
+  String _getUserDisplayName(S s, AppState appState) {
+    final name = appState.activeProfile?.name ?? '';
+    return name.isEmpty ? s.defaultUserName : name;
   }
 
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final userName = _getUserDisplayName(s);
     final appState = AppStateScope.of(context);
+    final userName = _getUserDisplayName(s, appState);
     final completedCount = appState.completedGamesCount;
     final totalGames = kGameSteps.length;
 
@@ -106,12 +96,9 @@ class HomeTab extends StatelessWidget {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
+                                  openParentArea(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SettingsScreen(),
-                                    ),
+                                    (context) => const SettingsScreen(),
                                   );
                                 },
                                 child: Column(

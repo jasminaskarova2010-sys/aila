@@ -28,33 +28,60 @@ class S {
       _t('!', '', ' -мен бірге\nкүнде үйрен!');
   String get onboardingGetStarted => _t('Начать', 'Get Started', 'Бастау');
 
-  // Create account screen
-  String get createAccountTitle =>
-      _t('Создать\nаккаунт', 'Create\nan account', 'Аккаунт\nжасау');
-  String get signInWithApple =>
-      _t('Войти через Apple', 'Sign in with Apple', 'Apple арқылы кіру');
-  String get signUpWithGoogle => _t(
-      'Регистрация через Google', 'Sign up with Google', 'Google арқылы тіркелу');
-  String get continueWithEmail => _t(
-      'Продолжить через email', 'Continue with email', 'Email арқылы жалғастыру');
-  String get emailHint => _t('Email', 'Email', 'Email');
-  String get passwordHint => _t('Пароль', 'Password', 'Құпия сөз');
-  String get createAccountButton =>
-      _t('Создать аккаунт', 'Create account', 'Аккаунт жасау');
-  String get loadingButton => _t('Загрузка...', 'Loading...', 'Жүктелуде...');
-  String get alreadyHaveAccount => _t(
-      'Уже есть аккаунт? ', 'Already have an account? ', 'Аккаунтыңыз бар ма? ');
-  String get logIn => _t('Войти', 'Log In', 'Кіру');
+  // Child profile screen
+  String get profileTitle =>
+      _t('Профиль ребёнка', 'Child profile', 'Бала профилі');
+  String get profileNewTitle =>
+      _t('Новый профиль', 'New profile', 'Жаңа профиль');
+  String get profileEditTitle =>
+      _t('Изменить профиль', 'Edit profile', 'Профильді өзгерту');
+  String get profileSubtitle => _t(
+      'Эти данные хранятся только на этом устройстве.',
+      'This information is stored on this device only.',
+      'Бұл деректер тек осы құрылғыда сақталады.');
+  String get profileNameLabel => _t('Имя ребёнка', "Child's name", 'Баланың аты');
+  String get profileNameHint =>
+      _t('Можно не заполнять', 'Optional', 'Міндетті емес');
+  String get profileAgeLabel => _t('Возраст, лет', 'Age, years', 'Жасы');
+  String get unnamedChild => _t('Без имени', 'No name', 'Атсыз');
+  String profileAge(int age) =>
+      _t('Возраст: $age', 'Age: $age', 'Жасы: $age');
+  String get saveButton => _t('Сохранить', 'Save', 'Сақтау');
+  String get continueButton => _t('Продолжить', 'Continue', 'Жалғастыру');
+  String get cancelButton => _t('Отмена', 'Cancel', 'Болдырмау');
 
-  // Login screen
-  String get loginTitle =>
-      _t('С\nвозвращением', 'Welcome\nback', 'Қайта\nқош келдіңіз');
-  String get signInWithGoogle =>
-      _t('Войти через Google', 'Sign in with Google', 'Google арқылы кіру');
-  String get logInButton => _t('Войти', 'Log In', 'Кіру');
-  String get dontHaveAccount => _t(
-      'Нет аккаунта? ', "Don't have an account? ", 'Аккаунтыңыз жоқ па? ');
-  String get signUp => _t('Регистрация', 'Sign Up', 'Тіркелу');
+  // Parent PIN
+  String get pinSetupTitle =>
+      _t('PIN родителя', 'Parent PIN', 'Ата-ана PIN коды');
+  String get pinSetupBody => _t(
+      'Придумайте 4 цифры. PIN закрывает настройки и родительский раздел, чтобы ребёнок случайно их не изменил.',
+      'Choose 4 digits. The PIN protects settings and the parent section so the child does not change them by accident.',
+      'Төрт сан ойлап табыңыз. PIN баптаулар мен ата-ана бөлімін бала кездейсоқ өзгертпеуі үшін қорғайды.');
+  String get pinConfirmBody => _t('Введите этот PIN ещё раз',
+      'Enter the same PIN again', 'Осы PIN кодты қайта енгізіңіз');
+  String get pinMismatch => _t('PIN не совпал. Придумайте его заново.',
+      'The PINs did not match. Please choose it again.',
+      'PIN сәйкес келмеді. Қайта ойлап табыңыз.');
+  String get pinEntryTitle =>
+      _t('Для взрослых', 'For grown-ups', 'Ересектерге арналған');
+  String get pinEntryBody => _t('Введите PIN родителя',
+      'Enter the parent PIN', 'Ата-ана PIN кодын енгізіңіз');
+  String get pinWrong => _t('PIN не подошёл. Попробуйте ещё раз.',
+      'That PIN did not match. Try again.',
+      'PIN сәйкес келмеді. Қайталап көріңіз.');
+  String get pinForgot =>
+      _t('Забыли PIN?', 'Forgot PIN?', 'PIN кодты ұмыттыңыз ба?');
+  String get pinResetTitle =>
+      _t('Сброс PIN', 'Reset PIN', 'PIN кодты қалпына келтіру');
+  String pinResetQuestion(int a, int b) => _t(
+      'Чтобы задать новый PIN, решите пример:\n$a × $b = ?',
+      'To set a new PIN, solve:\n$a × $b = ?',
+      'Жаңа PIN орнату үшін мысалды шешіңіз:\n$a × $b = ?');
+  String get pinResetWrong => _t('Ответ не подошёл. Вот другой пример.',
+      'That answer did not match. Here is another one.',
+      'Жауап сәйкес келмеді. Міне, басқа мысал.');
+  String get answerHint => _t('Ответ', 'Answer', 'Жауап');
+  String get checkButton => _t('Проверить', 'Check', 'Тексеру');
 
   // Home tab
   String greeting(String name) =>
@@ -76,6 +103,35 @@ class S {
   String get startingJourneySnackbar =>
       _t('Начинаем путешествие', 'Starting the journey', 'Саяхат басталады');
   String get defaultUserName => _t('друг', 'friend', 'дос');
+
+  // Games flow
+  String get sessionDoneTitle => _t(
+      'Занятие завершено! 🎉', 'Session complete! 🎉', 'Сабақ аяқталды! 🎉');
+  String sessionDoneBody(int stars) => stars > 0
+      ? _t(
+          'Ты дошёл до конца сегодняшнего путешествия и заработал $stars ⭐. Отличная работа!',
+          "You reached the end of today's journey and earned $stars ⭐. Great work!",
+          'Сен бүгінгі саяхаттың соңына жетіп, $stars ⭐ жинадың. Жарайсың!')
+      : _t(
+          'Ты дошёл до конца сегодняшнего путешествия. Отличная работа!',
+          "You reached the end of today's journey. Great work!",
+          'Сен бүгінгі саяхаттың соңына жеттің. Жарайсың!');
+  String get sessionDoneOk => _t('Отлично!', 'Great!', 'Тамаша!');
+
+  // Speak game (practice with a parent)
+  String get practiceWithParent => _t('Тренировка вместе с родителем',
+      'Practice together with a parent', 'Ата-анамен бірге жаттығу');
+  String get speakListen => _t('Послушать', 'Listen', 'Тыңдау');
+  String get speakTryRepeat =>
+      _t('Попробуй повторить', 'Try saying it', 'Қайталап көр');
+  String get speakParentHint => _t(
+      'Взрослый: отметьте, как получилось. Оба ответа подходят.',
+      'Grown-up: tap how it went. Both answers are fine.',
+      'Ересек адам: қалай болғанын белгілеңіз. Екі жауап та дұрыс.');
+  String get speakDone => _t('Получилось', 'We did it', 'Шықты');
+  String get speakLater => _t('Попробуем потом', 'Try later', 'Кейін байқаймыз');
+  String get speakLaterSnackbar => _t('Хорошо, вернёмся к этому позже',
+      "Okay, we'll come back to it later", 'Жарайды, кейінірек оралайық');
 
   // Bottom nav / main screen
   String get navHome => _t('Главная', 'Home', 'Басты бет');
@@ -106,13 +162,15 @@ class S {
   String get sound => _t('Звук', 'Sound', 'Дыбыс');
   String get music => _t('Музыка', 'Music', 'Музыка');
   String get vibration => _t('Вибрация', 'Vibration', 'Дірілдеу');
-  String get sectionAccount => _t('Аккаунт', 'Account', 'Аккаунт');
-  String get syncProgress => _t(
-      'Синхронизация прогресса', 'Sync progress', 'Прогресті синхрондау');
+  String get sectionProfiles =>
+      _t('Профили детей', 'Child profiles', 'Балалар профильдері');
+  String get addProfile => _t('Добавить профиль', 'Add profile', 'Профиль қосу');
+  String get editProfile => _t('Изменить текущий профиль',
+      'Edit current profile', 'Ағымдағы профильді өзгерту');
+  String get changePin => _t('Сменить PIN', 'Change PIN', 'PIN кодты өзгерту');
   String get sectionOther => _t('Другое', 'Other', 'Басқа');
   String get supportRow =>
       _t('Помощь и поддержка', 'Help & Support', 'Көмек және қолдау');
-  String get logout => _t('Выйти из аккаунта', 'Log out', 'Аккаунттан шығу');
   String get sectionLanguage => _t('Язык', 'Language', 'Тіл');
 
   // Info screen

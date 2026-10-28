@@ -1,8 +1,8 @@
 // lib/onboarding_screen.dart
 
 import 'package:flutter/material.dart';
-import 'create_account_screen.dart';
 import 'l10n/strings.dart';
+import 'parent/profile_form_screen.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -100,7 +100,8 @@ class OnboardingScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CreateAccountScreen(),
+                            builder: (context) =>
+                                const ProfileFormScreen(firstRun: true),
                           ),
                         );
                       },

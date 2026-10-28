@@ -1,6 +1,7 @@
 // lib/games/game_shell.dart
 
 import 'package:flutter/material.dart';
+import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
 import 'missing_photo_placeholder.dart';
 
@@ -111,11 +112,9 @@ class GameShell extends StatelessWidget {
                       _CircleIconButton(
                         icon: Icons.settings,
                         onTap: () {
-                          Navigator.push(
+                          openParentArea(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => const SettingsScreen(),
-                            ),
+                            (context) => const SettingsScreen(),
                           );
                         },
                       ),

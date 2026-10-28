@@ -1,32 +1,26 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'l10n/app_language.dart';
+import 'main_screen.dart';
 import 'onboarding_screen.dart';
+import 'parent/pin_screens.dart';
 import 'state/app_state.dart';
 
 void main() async {
   // Обязательная привязка Flutter
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Инициализация Firebase с обработкой возможных ошибок
-  try {
-    if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-    }
-  } catch (e) {
-    debugPrint("Ошибка инициализации Firebase: $e");
-  }
+  // Загружаем сохранённые профили, звёзды и настройки с устройства
+  final appState = await AppState.load();
 
-  runApp(const MyApp());
+  runApp(MyApp(appState: appState));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final AppState appState;
+
+  const MyApp({super.key, required this.appState});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -34,13 +28,33 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final LocaleController _localeController = LocaleController();
-  final AppState _appState = AppState();
+
+  @override
+  void initState() {
+    super.initState();
+    _syncLanguage();
+    widget.appState.addListener(_syncLanguage);
+  }
+
+  // Язык интерфейса всегда совпадает с языком текущего профиля ребёнка.
+  void _syncLanguage() {
+    final profile = widget.appState.activeProfile;
+    if (profile != null) _localeController.setLanguage(profile.language);
+  }
 
   @override
   void dispose() {
+    widget.appState.removeListener(_syncLanguage);
     _localeController.dispose();
-    _appState.dispose();
+    widget.appState.dispose();
     super.dispose();
+  }
+
+  Widget _initialScreen() {
+    final appState = widget.appState;
+    if (!appState.hasProfile) return const OnboardingScreen();
+    if (!appState.hasPin) return const PinSetupScreen();
+    return const MainScreen();
   }
 
   @override
@@ -48,10 +62,10 @@ class _MyAppState extends State<MyApp> {
     return AppLocaleScope(
       controller: _localeController,
       child: AppStateScope(
-        state: _appState,
-        child: const MaterialApp(
+        state: widget.appState,
+        child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: OnboardingScreen(),
+          home: _initialScreen(),
         ),
       ),
     );

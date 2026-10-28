@@ -32,12 +32,6 @@ class InfoScreen extends StatelessWidget {
                         iconColor: const Color(0xFFE0A93E),
                         value: '${appState.stars}',
                       ),
-                      const SizedBox(width: 10),
-                      _StatPill(
-                        icon: Icons.diamond,
-                        iconColor: const Color(0xFF8677A5),
-                        value: '5653',
-                      ),
                     ],
                   ),
                   _CircleIconButton(

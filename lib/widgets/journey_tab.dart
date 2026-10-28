@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../games/games_flow_screen.dart';
 import '../games/journey_titles_sheet.dart';
 import '../l10n/strings.dart';
+import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
 import '../state/app_state.dart';
 
@@ -116,12 +117,6 @@ class _JourneyTabState extends State<JourneyTab> {
                             iconColor: const Color(0xFFE0A93E),
                             value: '${appState.stars}',
                           ),
-                          const SizedBox(width: 10),
-                          _StatPill(
-                            icon: Icons.diamond,
-                            iconColor: const Color(0xFF8677A5),
-                            value: '5653',
-                          ),
                         ],
                       ),
                       Column(
@@ -129,11 +124,9 @@ class _JourneyTabState extends State<JourneyTab> {
                           _CircleIconButton(
                             icon: Icons.settings,
                             onTap: () {
-                              Navigator.push(
+                              openParentArea(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SettingsScreen(),
-                                ),
+                                (context) => const SettingsScreen(),
                               );
                             },
                           ),

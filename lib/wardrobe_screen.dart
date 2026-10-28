@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'state/app_state.dart';
 import 'settings_screen.dart';
+import 'parent/pin_screens.dart';
 import 'wardrobe/wardrobe_items.dart';
 
 class WardrobeScreen extends StatefulWidget {
@@ -64,12 +65,6 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                             iconColor: const Color(0xFFE0A93E),
                             value: '${appState.stars}',
                           ),
-                          const SizedBox(width: 10),
-                          _StatPill(
-                            icon: Icons.diamond,
-                            iconColor: const Color(0xFF8677A5),
-                            value: '5653',
-                          ),
                         ],
                       ),
                       Column(
@@ -77,11 +72,9 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           _CircleIconButton(
                             icon: Icons.settings,
                             onTap: () {
-                              Navigator.push(
+                              openParentArea(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SettingsScreen(),
-                                ),
+                                (context) => const SettingsScreen(),
                               );
                             },
                           ),

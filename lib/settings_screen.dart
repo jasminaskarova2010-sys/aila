@@ -1,45 +1,27 @@
 // lib/settings_screen.dart
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'info_screen.dart';
 import 'l10n/app_language.dart';
 import 'l10n/strings.dart';
-import 'onboarding_screen.dart';
+import 'parent/pin_screens.dart';
+import 'parent/profile_form_screen.dart';
 import 'state/app_state.dart';
 import 'support_screen.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _soundEnabled = true;
-  bool _musicEnabled = true;
-  bool _vibrationEnabled = true;
-  bool _syncEnabled = true;
-
-  Future<void> _handleLogout() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-    } catch (_) {
-      // Аккаунт мог быть не настоящим (вход временно упрощён) — игнорируем.
-    }
-    if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-      (route) => false,
-    );
+  void _push(BuildContext context, Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final localeController = AppLocaleScope.of(context);
     final appState = AppStateScope.of(context);
+    final activeProfile = appState.activeProfile;
+    final language = activeProfile?.language ?? AppLocaleScope.of(context).language;
     return Scaffold(
       backgroundColor: const Color(0xFFFAF0EA),
       body: SafeArea(
@@ -54,12 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _CircleIconButton(
                     icon: Icons.info_outline,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const InfoScreen(),
-                        ),
-                      );
+                      _push(context, const InfoScreen());
                     },
                   ),
                   Row(
@@ -147,35 +124,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _ToggleRow(
                     icon: Icons.volume_up,
                     label: s.sound,
-                    value: _soundEnabled,
-                    onChanged: (v) => setState(() => _soundEnabled = v),
+                    value: appState.soundEnabled,
+                    onChanged: appState.setSoundEnabled,
                   ),
                   const _RowDivider(),
                   _ToggleRow(
                     icon: Icons.music_note,
                     label: s.music,
-                    value: _musicEnabled,
-                    onChanged: (v) => setState(() => _musicEnabled = v),
+                    value: appState.musicEnabled,
+                    onChanged: appState.setMusicEnabled,
                   ),
                   const _RowDivider(),
                   _ToggleRow(
                     icon: Icons.vibration,
                     label: s.vibration,
-                    value: _vibrationEnabled,
-                    onChanged: (v) => setState(() => _vibrationEnabled = v),
+                    value: appState.vibrationEnabled,
+                    onChanged: appState.setVibrationEnabled,
                   ),
                 ],
               ),
               const SizedBox(height: 24),
-              _SectionTitle(s.sectionAccount),
+              _SectionTitle(s.sectionProfiles),
               const SizedBox(height: 12),
               _SettingsCard(
                 children: [
-                  _ToggleRow(
-                    icon: Icons.cloud_upload_outlined,
-                    label: s.syncProgress,
-                    value: _syncEnabled,
-                    onChanged: (v) => setState(() => _syncEnabled = v),
+                  for (final profile in appState.profiles) ...[
+                    _ProfileRow(
+                      name: profile.name.isEmpty ? s.unnamedChild : profile.name,
+                      details: s.profileAge(profile.age),
+                      selected: profile.id == activeProfile?.id,
+                      onTap: () => appState.switchProfile(profile.id),
+                    ),
+                    const _RowDivider(),
+                  ],
+                  if (activeProfile != null) ...[
+                    _NavigationRow(
+                      icon: Icons.edit_outlined,
+                      label: s.editProfile,
+                      onTap: () => _push(
+                        context,
+                        ProfileFormScreen(editing: activeProfile),
+                      ),
+                    ),
+                    const _RowDivider(),
+                  ],
+                  _NavigationRow(
+                    icon: Icons.person_add_alt,
+                    label: s.addProfile,
+                    onTap: () => _push(context, const ProfileFormScreen()),
+                  ),
+                  const _RowDivider(),
+                  _NavigationRow(
+                    icon: Icons.lock_outline,
+                    label: s.changePin,
+                    onTap: () =>
+                        _push(context, const PinSetupScreen(isReset: true)),
                   ),
                 ],
               ),
@@ -186,20 +189,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   _LanguageRow(
                     label: 'Русский',
-                    selected: localeController.language == AppLanguage.ru,
-                    onTap: () => localeController.setLanguage(AppLanguage.ru),
+                    selected: language == AppLanguage.ru,
+                    onTap: () => appState.setLanguage(AppLanguage.ru),
                   ),
                   const _RowDivider(),
                   _LanguageRow(
                     label: 'English',
-                    selected: localeController.language == AppLanguage.en,
-                    onTap: () => localeController.setLanguage(AppLanguage.en),
+                    selected: language == AppLanguage.en,
+                    onTap: () => appState.setLanguage(AppLanguage.en),
                   ),
                   const _RowDivider(),
                   _LanguageRow(
                     label: 'Қазақша',
-                    selected: localeController.language == AppLanguage.kk,
-                    onTap: () => localeController.setLanguage(AppLanguage.kk),
+                    selected: language == AppLanguage.kk,
+                    onTap: () => appState.setLanguage(AppLanguage.kk),
                   ),
                 ],
               ),
@@ -212,20 +215,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icons.help_outline,
                     label: s.supportRow,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SupportScreen(),
-                        ),
-                      );
+                      _push(context, const SupportScreen());
                     },
-                  ),
-                  const _RowDivider(),
-                  _NavigationRow(
-                    icon: Icons.logout,
-                    label: s.logout,
-                    color: const Color(0xFFD1453B),
-                    onTap: _handleLogout,
                   ),
                 ],
               ),
@@ -456,6 +447,61 @@ class _LanguageRow extends StatelessWidget {
                     fontWeight:
                         selected ? FontWeight.bold : FontWeight.w500,
                   ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileRow extends StatelessWidget {
+  final String name;
+  final String details;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ProfileRow({
+    required this.name,
+    required this.details,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Row(
+            children: [
+              Icon(
+                selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                color:
+                    selected ? const Color(0xFF7A6C99) : const Color(0xFFB3ACC0),
+                size: 22,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    color: const Color(0xFF331A47),
+                    fontSize: 15,
+                    fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                  ),
+                ),
+              ),
+              Text(
+                details,
+                style: TextStyle(
+                  color: const Color(0xFF331A47).withOpacity(0.55),
+                  fontSize: 13,
                 ),
               ),
             ],

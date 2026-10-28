@@ -34,9 +34,10 @@ flutter pub get             # install dependencies after editing pubspec.yaml
 flutter analyze lib/        # static analysis — run after every change, must be clean (infos like deprecated withOpacity are pre-existing and OK)
 flutter run -d macos        # run on macOS desktop (primary dev target used in this repo)
 flutter devices             # list available run targets
+flutter test                # widget/unit tests in test/ (stage1_test.dart: persistence, profile, PIN, stars, speak game, all games open)
 ```
 
-No tests currently exist (`test/` is empty) and there is no CI config.
+There is no CI config. `flutter_tts` has no test implementation — tests that open screens using TTS mock the `flutter_tts` MethodChannel.
 
 ### Running the app during development
 
@@ -50,19 +51,25 @@ pgrep -x "aila_app"
 
 To restart after code changes, kill the running binary first: `pkill -x "aila_app"`, then re-run. Hot reload/restart via the `flutter run` keypress interface also works if the process is still attached to a terminal.
 
-macOS entitlements note: `macos/Runner/*.entitlements` have `com.apple.security.app-sandbox` **disabled**. This was deliberate — enabling the sandbox breaks Firebase Auth's Keychain access (`keychain-error`) and Sign in with Apple requires a paid Apple Developer Team signing identity that isn't configured here. Do not re-enable sandboxing or add `keychain-access-groups`/`com.apple.developer.applesignin` entitlements without a real signing team, or the build will fail with "has entitlements that require signing with a development certificate."
+macOS entitlements note: `macos/Runner/*.entitlements` have `com.apple.security.app-sandbox` **disabled**. This was originally done for Firebase Auth's Keychain access (Firebase has since been removed) and because no paid Apple Developer Team signing identity is configured. Do not re-enable sandboxing or add `keychain-access-groups`/`com.apple.developer.applesignin` entitlements without a real signing team, or the build will fail with "has entitlements that require signing with a development certificate."
 
 ## Architecture
 
 ### Navigation shell
 
-`main.dart` wraps the app in two app-wide `InheritedNotifier` scopes — `AppLocaleScope` (current language) and `AppStateScope` (stars/outfits/game-completion state) — above a `MaterialApp` rooted at `OnboardingScreen`. Auth screens (`onboarding_screen.dart` → `create_account_screen.dart` / `login_screen.dart`) currently route straight to `MainScreen` on any tap of the auth buttons — the actual Firebase email/Google/Apple sign-in call sites were intentionally stripped out and are not wired to the UI (auth is deferred; re-wiring it is a known future task, not a bug). `firebase_options.dart` and `main.dart`'s `Firebase.initializeApp` still run at startup so Firebase stays available for when auth is reconnected.
+`main.dart` loads `AppState` from disk (`await AppState.load()`) before `runApp`, then wraps the app in two app-wide `InheritedNotifier` scopes — `AppLocaleScope` (current language) and `AppStateScope` (profiles/stars/outfits/settings/PIN). `_MyAppState` listens to `AppState` and keeps the UI language equal to the active child profile's language. The start screen depends on saved state: no profile → `OnboardingScreen` → `ProfileFormScreen(firstRun: true)` → `PinSetupScreen` → `MainScreen`; profile but no PIN → `PinSetupScreen`; otherwise `MainScreen`.
+
+There is **no account/login, no Firebase, no network** (TZ П7, "Что НЕ входит в MVP"): email/password screens, `firebase_*`, `google_sign_in`, `sign_in_with_apple` were removed in stage 1. Don't reintroduce them.
+
+**Parent PIN gate (`lib/parent/pin_screens.dart`)**: every adult-only screen (settings and anything reachable only from it: profiles, language, info, support contacts; later the parent section, links, journal) must be opened via `openParentArea(context, builder)`, never a bare `Navigator.push`. It shows `PinEntryScreen` and replaces it with the target on the correct PIN. Forgotten PIN → a random `a × b` multiplication challenge → `PinSetupScreen(isReset: true)` (protection from the child, not from an adult). `lib/parent/profile_form_screen.dart` creates/edits child profiles (name optional, age 2–12, language).
 
 `MainScreen` hosts the bottom nav with an `IndexedStack` of three tabs: `HomeTab`, `JourneyTab`, `WardrobeScreen`.
 
 ### Global state (`lib/state/app_state.dart`)
 
-`AppState` (a `ChangeNotifier` exposed via `AppStateScope.of(context)`) is the single source of truth for: star balance, owned/equipped wardrobe outfits, and which of the 8 games in today's journey have been completed. **It is in-memory only — nothing persists across app restarts.** Each completed game step awards `kStarsPerGame` (50) stars via `GamesFlowScreen._handleComplete`.
+`AppState` (a `ChangeNotifier` exposed via `AppStateScope.of(context)`) is the single source of truth. It holds a list of `ChildProfile`s plus the active profile id, the parent PIN and device-wide settings (sound/music/vibration). **Per profile**: name, age, language, stars, owned/equipped outfits, completed game indices — getters like `stars`/`isOwned`/`isGameCompleted` read the active profile. Everything is saved on-device as one JSON blob in `shared_preferences` (key `aila_state_v1`) on every mutation via `_changed()`; add new persisted fields to both `toJson`/`fromJson` (with defaults, so old saves still load).
+
+Stars are honest: `completeGame(index, reward)` awards stars only on the **first** completion of a step and returns whether it did; replays are allowed but give nothing. `GamesFlowScreen` calls it with `kStarsPerGame` (50) and shows the "+50" snackbar only when stars were actually awarded.
 
 ### Localization (`lib/l10n/`)
 
@@ -71,6 +78,8 @@ Hand-rolled, not `flutter gen-l10n`/ARB-based. `AppLanguage` enum (ru/en/kk) + `
 ### Games (`lib/games/`)
 
 `game_models.dart` defines `GameStep` (one config class covering all 4 game kinds: `choice`, `order`, `categorize`, `speak`) and the ordered `kGameSteps` list — this list **is** the day's "journey" (8 steps). `GamesFlowScreen` walks through `kGameSteps` sequentially, rendering the right screen widget per `GameKind` (`choice_game_screen.dart`, `order_game_screen.dart`, `categorize_game_screen.dart`, `speak_game_screen.dart`), all built on the shared `GameShell` scaffold (`game_shell.dart`) for consistent header/progress/feedback chrome. `journey_titles_sheet.dart` is the bottom sheet listing all steps by title (opened from `HomeTab` and `JourneyTab`), letting the user jump into any step directly via `GamesFlowScreen(startIndex: i)`.
+
+The speak game is "Тренировка вместе с родителем": there is no speech recognition (out of MVP scope), so it must never auto-succeed. The app speaks `speakPhrase` via `flutter_tts` on tap of «Послушать», and the **adult** taps «Получилось» (→ normal success feedback → `onComplete`) or «Попробуем потом» (→ `onSkip`: next step, no stars, step stays uncompleted, neutral snackbar, no error state).
 
 **Visual content policy for game steps**: each `GameStep`'s imagery resolves in priority order — real photo (`imagePath`, files under `assets/games/<category>/`) → simple vector illustration (`pictogramBuilder`, hand-drawn `CustomPainter`s in `game_pictograms.dart` / `pecs/pictograms.dart`, used only for neutral objects where an abstract illustration can't distort meaning) → explicit "photo needed" placeholder (`promptPlaceholderNote` → `MissingPhotoPlaceholder`) when neither exists yet. **Never fall back to emoji for instructional content** — this was a deliberate, explicit product decision. Decorative chrome (background clouds/rocket, wardrobe icons, dialog titles) is exempt from this rule and may use emoji/Material icons freely.
 
