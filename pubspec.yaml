@@ -1,0 +1,50 @@
+name: aila_app
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.7.0
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.0
+  crypto: ^3.0.3
+  flutter_tts: ^4.2.5
+  flutter_svg: ^2.3.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/star_mascot.png
+    - assets/IMG_7941.PNG
+    - assets/IMG_7942.PNG
+    - assets/IMG_7943.PNG
+    - assets/IMG_7944.PNG
+    - assets/IMG_7945.PNG
+    - assets/games/emotions/sad_child.PNG
+    - assets/games/emotions/happy_child.PNG
+    - assets/games/emotions/angry_child.PNG
+    - assets/games/social/shop_scene.PNG
+    - assets/games/social/waiting_in_line.PNG
+    - assets/games/social/shouting_child.PNG
+    - assets/games/social/running_child.PNG
+    - assets/games/social/comforting_friend.PNG
+    - assets/games/daily-life/waking_up.PNG
+    - assets/games/daily-life/brushing_teeth.PNG
+    - assets/games/daily-life/eating_breakfast.PNG
+    - assets/games/daily-life/getting_dressed.PNG
+    - assets/pecs_symbols/
+

@@ -1,0 +1,511 @@
+// lib/settings_screen.dart
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'info_screen.dart';
+import 'l10n/app_language.dart';
+import 'l10n/strings.dart';
+import 'onboarding_screen.dart';
+import 'state/app_state.dart';
+import 'support_screen.dart';
+
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _soundEnabled = true;
+  bool _musicEnabled = true;
+  bool _vibrationEnabled = true;
+  bool _syncEnabled = true;
+
+  Future<void> _handleLogout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (_) {
+      // Аккаунт мог быть не настоящим (вход временно упрощён) — игнорируем.
+    }
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+      (route) => false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final localeController = AppLocaleScope.of(context);
+    final appState = AppStateScope.of(context);
+    return Scaffold(
+      backgroundColor: const Color(0xFFFAF0EA),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _CircleIconButton(
+                    icon: Icons.info_outline,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const InfoScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  Row(
+                    children: [
+                      _StatPill(
+                        icon: Icons.star,
+                        iconColor: const Color(0xFFE0A93E),
+                        value: '${appState.stars}',
+                      ),
+                      const SizedBox(width: 10),
+                      _StatPill(
+                        icon: Icons.diamond,
+                        iconColor: const Color(0xFF8677A5),
+                        value: '5653',
+                      ),
+                    ],
+                  ),
+                  _CircleIconButton(
+                    icon: Icons.close,
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF331A47).withOpacity(0.06),
+                      offset: const Offset(0, 6),
+                      blurRadius: 14,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF331A47),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.settings,
+                          color: Colors.white, size: 26),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.settingsTitle,
+                            style: const TextStyle(
+                              color: Color(0xFF331A47),
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            s.settingsSubtitle,
+                            style: TextStyle(
+                              color: const Color(0xFF331A47).withOpacity(0.55),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.cloud,
+                        color: Color(0xFFB8A9DE), size: 30),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+              _SectionTitle(s.sectionGeneral),
+              const SizedBox(height: 12),
+              _SettingsCard(
+                children: [
+                  _ToggleRow(
+                    icon: Icons.volume_up,
+                    label: s.sound,
+                    value: _soundEnabled,
+                    onChanged: (v) => setState(() => _soundEnabled = v),
+                  ),
+                  const _RowDivider(),
+                  _ToggleRow(
+                    icon: Icons.music_note,
+                    label: s.music,
+                    value: _musicEnabled,
+                    onChanged: (v) => setState(() => _musicEnabled = v),
+                  ),
+                  const _RowDivider(),
+                  _ToggleRow(
+                    icon: Icons.vibration,
+                    label: s.vibration,
+                    value: _vibrationEnabled,
+                    onChanged: (v) => setState(() => _vibrationEnabled = v),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _SectionTitle(s.sectionAccount),
+              const SizedBox(height: 12),
+              _SettingsCard(
+                children: [
+                  _ToggleRow(
+                    icon: Icons.cloud_upload_outlined,
+                    label: s.syncProgress,
+                    value: _syncEnabled,
+                    onChanged: (v) => setState(() => _syncEnabled = v),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _SectionTitle(s.sectionLanguage),
+              const SizedBox(height: 12),
+              _SettingsCard(
+                children: [
+                  _LanguageRow(
+                    label: 'Русский',
+                    selected: localeController.language == AppLanguage.ru,
+                    onTap: () => localeController.setLanguage(AppLanguage.ru),
+                  ),
+                  const _RowDivider(),
+                  _LanguageRow(
+                    label: 'English',
+                    selected: localeController.language == AppLanguage.en,
+                    onTap: () => localeController.setLanguage(AppLanguage.en),
+                  ),
+                  const _RowDivider(),
+                  _LanguageRow(
+                    label: 'Қазақша',
+                    selected: localeController.language == AppLanguage.kk,
+                    onTap: () => localeController.setLanguage(AppLanguage.kk),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _SectionTitle(s.sectionOther),
+              const SizedBox(height: 12),
+              _SettingsCard(
+                children: [
+                  _NavigationRow(
+                    icon: Icons.help_outline,
+                    label: s.supportRow,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SupportScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const _RowDivider(),
+                  _NavigationRow(
+                    icon: Icons.logout,
+                    label: s.logout,
+                    color: const Color(0xFFD1453B),
+                    onTap: _handleLogout,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CircleIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _CircleIconButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Container(
+          width: 44,
+          height: 44,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF331A47).withOpacity(0.08),
+                offset: const Offset(0, 4),
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: Icon(icon, color: const Color(0xFF331A47), size: 20),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatPill extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String value;
+
+  const _StatPill({
+    required this.icon,
+    required this.iconColor,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF331A47).withOpacity(0.06),
+            offset: const Offset(0, 3),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 16),
+          const SizedBox(width: 6),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Color(0xFF331A47),
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+
+  const _SectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Color(0xFF331A47),
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+}
+
+class _SettingsCard extends StatelessWidget {
+  final List<Widget> children;
+
+  const _SettingsCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF331A47).withOpacity(0.06),
+            offset: const Offset(0, 4),
+            blurRadius: 12,
+          ),
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+}
+
+class _RowDivider extends StatelessWidget {
+  const _RowDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      color: const Color(0xFF331A47).withOpacity(0.08),
+    );
+  }
+}
+
+class _ToggleRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _ToggleRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFF331A47), size: 22),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFF331A47),
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: Colors.white,
+            activeTrackColor: const Color(0xFF7A6C99),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LanguageRow extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LanguageRow({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Row(
+            children: [
+              Icon(
+                selected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
+                color: selected
+                    ? const Color(0xFF7A6C99)
+                    : const Color(0xFFB3ACC0),
+                size: 22,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: const Color(0xFF331A47),
+                    fontSize: 15,
+                    fontWeight:
+                        selected ? FontWeight.bold : FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavigationRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color color;
+
+  const _NavigationRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color = const Color(0xFF331A47),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 22),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right, color: color.withOpacity(0.6)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
