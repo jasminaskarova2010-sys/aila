@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_language.dart';
 import '../l10n/strings.dart';
-import '../main_screen.dart';
 import '../state/app_state.dart';
+import '../survey/survey_screen.dart';
 import '../widgets/primary_button.dart';
 import 'pin_screens.dart';
 
@@ -83,13 +83,17 @@ class _ProfileFormScreenState extends State<ProfileFormScreen> {
       language: _language!,
     );
     if (!widget.firstRun) {
-      Navigator.of(context).pop();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const SurveyScreen()),
+      );
       return;
     }
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (_) =>
-            appState.hasPin ? const MainScreen() : const PinSetupScreen(),
+            appState.hasPin
+                ? const SurveyScreen(firstRun: true)
+                : const PinSetupScreen(),
       ),
       (route) => false,
     );

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../board/board_words.dart';
 import '../l10n/app_language.dart';
+import '../survey/survey_data.dart';
 
 /// Профиль одного ребёнка. У каждого ребёнка свои звёзды, наряды и
 /// пройденные задания.
@@ -30,6 +31,10 @@ class ChildProfile {
   final Set<BoardCategory> hiddenCategories;
   final List<ParentCard> parentCards;
 
+  // Опрос родителя
+  List<SurveyAnswer> surveyAnswers;
+  DateTime? lastSurveyAt;
+
   ChildProfile({
     required this.id,
     this.name = '',
@@ -48,12 +53,15 @@ class ChildProfile {
     Set<String>? hiddenWordIds,
     Set<BoardCategory>? hiddenCategories,
     List<ParentCard>? parentCards,
+    List<SurveyAnswer>? surveyAnswers,
+    this.lastSurveyAt,
   }) : ownedOutfitIds = ownedOutfitIds ?? {'default'},
        completedGameIndices = completedGameIndices ?? {},
        favoriteWordIds = favoriteWordIds ?? List.of(kDefaultFavoriteIds),
        hiddenWordIds = hiddenWordIds ?? {},
        hiddenCategories = hiddenCategories ?? {},
-       parentCards = parentCards ?? [];
+       parentCards = parentCards ?? [],
+       surveyAnswers = surveyAnswers ?? [];
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -72,6 +80,8 @@ class ChildProfile {
     'hiddenWordIds': hiddenWordIds.toList(),
     'hiddenCategories': hiddenCategories.map((c) => c.name).toList(),
     'parentCards': parentCards.map((c) => c.toJson()).toList(),
+    'surveyAnswers': surveyAnswers.map((a) => a.name).toList(),
+    'lastSurveyAt': lastSurveyAt?.toIso8601String(),
   };
 
   factory ChildProfile.fromJson(Map<String, dynamic> json) => ChildProfile(
@@ -110,6 +120,12 @@ class ChildProfile {
     parentCards: (json['parentCards'] as List? ?? [])
         .map((c) => ParentCard.fromJson(c as Map<String, dynamic>))
         .toList(),
+    surveyAnswers: [
+      for (final name in (json['surveyAnswers'] as List? ?? []).cast<String>())
+        for (final answer in SurveyAnswer.values)
+          if (answer.name == name) answer,
+    ],
+    lastSurveyAt: DateTime.tryParse(json['lastSurveyAt'] as String? ?? ''),
   );
 }
 
@@ -351,6 +367,21 @@ class AppState extends ChangeNotifier {
 
   void addParentCard(ParentCard card) =>
       _updateBoard((p) => p.parentCards.add(card));
+
+  // Опрос родителя (текущего профиля)
+
+  void saveSurvey(List<SurveyAnswer> answers, {DateTime? now}) =>
+      _updateBoard((p) {
+        p.surveyAnswers = List.of(answers);
+        p.lastSurveyAt = now ?? DateTime.now();
+      });
+
+  /// Прошло 4 недели с последнего опроса: пора напомнить родителю.
+  bool isSurveyDue({DateTime? now}) {
+    final last = activeProfile?.lastSurveyAt;
+    if (last == null) return false;
+    return (now ?? DateTime.now()).difference(last).inDays >= kSurveyRepeatDays;
+  }
 }
 
 class AppStateScope extends InheritedNotifier<AppState> {

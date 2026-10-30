@@ -2,6 +2,7 @@
 
 import 'package:flutter/widgets.dart';
 import '../board/board_words.dart';
+import '../survey/survey_data.dart';
 import 'app_language.dart';
 import 'board_labels.dart';
 
@@ -382,4 +383,143 @@ class S {
       'Mulberry Symbols: © Steve Lee, лицензия CC BY-SA 4.0.\n\nАвтор пиктограмм: Sergio Palao. Источник: ARASAAC (https://arasaac.org). Лицензия: CC BY-NC-SA. Собственность: Правительство Арагона.',
       'Mulberry Symbols: © Steve Lee, CC BY-SA 4.0 license.\n\nPictograms author: Sergio Palao. Source: ARASAAC (https://arasaac.org). License: CC BY-NC-SA. Owner: Government of Aragon.',
       'Mulberry Symbols: © Steve Lee, CC BY-SA 4.0 лицензиясы.\n\nПиктограммалар авторы: Sergio Palao. Дереккөз: ARASAAC (https://arasaac.org). Лицензия: CC BY-NC-SA. Меншік иесі: Арагон үкіметі.');
+
+  // Опрос родителя. ЧЕРНОВИК: тексты должен проверить специалист.
+  String get surveyTitle => _t('Опрос для родителя', 'Parent survey', 'Ата-анаға сауалнама');
+  String surveyQuestion(int index) {
+    switch (index) {
+      case 0:
+        return _t('Ребёнок сам даёт вам картинку или предмет, чтобы получить то, что хочет?',
+            'Does your child give you a picture or an object on their own to get what they want?',
+            'Бала қалағанын алу үшін сізге суретті немесе затты өзі бере ме?');
+      case 1:
+        return _t('Ребёнок сам подходит к вам или к своим карточкам, даже если вы в другом конце комнаты?',
+            'Does your child come to you or to their cards on their own, even if you are across the room?',
+            'Сіз бөлменің екінші жағында болсаңыз да, бала сізге немесе карточкаларына өзі келе ме?');
+      case 2:
+        return _t('Если перед ребёнком две картинки, он выбирает ту, что изображает нужную вещь?',
+            'When there are two pictures in front of your child, do they choose the one showing what they need?',
+            'Баланың алдында екі сурет болса, ол керек затты көрсететінін таңдай ма?');
+      case 3:
+        return _t('Ребёнок находит нужную картинку среди 5 и больше или на другой странице?',
+            'Does your child find the right picture among 5 or more, or on another page?',
+            'Бала керек суретті 5 немесе одан көп сурет арасынан не басқа беттен таба ма?');
+      case 4:
+        return _t('Ребёнок составляет из двух картинок фразу «Я хочу + предмет»?',
+            'Does your child build the phrase "I want + item" from two pictures?',
+            'Бала екі суреттен «Мен қалаймын + зат» сөйлемін құрай ма?');
+      case 5:
+        return _t('Ребёнок добавляет к просьбе цвет, размер или действие («большой мяч»)?',
+            'Does your child add a colour, size or action to a request ("big ball")?',
+            'Бала өтінішіне түсті, өлшемді немесе әрекетті қоса ма («үлкен доп»)?');
+      case 6:
+        return _t('Ребёнок отвечает картинками или словами на вопрос «Что ты хочешь?»',
+            'Does your child answer the question "What do you want?" with pictures or words?',
+            'Бала «Не қалайсың?» сұрағына суреттермен немесе сөзбен жауап бере ме?');
+      default:
+        return _t('Ребёнок сам рассказывает о том, что видит или слышит («я вижу собаку»)?',
+            'Does your child talk on their own about what they see or hear ("I see a dog")?',
+            'Бала көргені немесе естігені туралы өзі айта ма («мен итті көріп тұрмын»)?');
+    }
+  }
+  String surveyAnswer(SurveyAnswer answer) {
+    switch (answer) {
+      case SurveyAnswer.never:
+        return _t('Никогда', 'Never', 'Ешқашан');
+      case SurveyAnswer.sometimes:
+        return _t('Иногда', 'Sometimes', 'Кейде');
+      case SurveyAnswer.almostAlways:
+        return _t('Почти всегда', 'Almost always', 'Әрдайым дерлік');
+    }
+  }
+  String get surveyDisclaimer => _t(
+      'Это не диагноз и не медицинская оценка. Опрос помогает выбрать, с чего начать. Если сомневаетесь, обратитесь к логопеду или дефектологу.',
+      'This is not a diagnosis or a medical assessment. The survey helps you choose where to start. If in doubt, talk to a speech therapist or a special education teacher.',
+      'Бұл диагноз емес және медициналық бағалау емес. Сауалнама неден бастауды таңдауға көмектеседі. Күмәндансаңыз, логопедке немесе дефектологқа жүгініңіз.');
+  String get surveyLater => _t('Пройти позже', 'Take it later', 'Кейінірек өту');
+  String get surveyRecommended =>
+      _t('Рекомендуем начать с фазы', 'We recommend starting with phase', 'Осы кезеңнен бастауды ұсынамыз');
+  String get surveyChosen => _t('Выбранная фаза', 'Chosen phase', 'Таңдалған кезең');
+  String get surveyChangeManually =>
+      _t('Изменить фазу вручную', 'Change the phase manually', 'Кезеңді қолмен өзгерту');
+  String get surveySpecialistBody => _t(
+      'Сейчас ребёнку важнее научиться отдавать карточку взрослому из рук в руки. Это лучше делать с напечатанными карточками и специалистом.',
+      'Right now it is more important for your child to learn to hand a card to an adult. This is best done with printed cards and a specialist.',
+      'Қазір балаға карточканы ересекке қолдан қолға беруді үйрену маңыздырақ. Мұны басылған карточкалармен және маманмен жасаған дұрыс.');
+  String get surveyOpenBoardAnyway =>
+      _t('Всё равно открыть доску', 'Open the board anyway', 'Бәрібір тақтаны ашу');
+  String get surveyOpen => _t('Пройти опрос', 'Take the survey', 'Сауалнамадан өту');
+  String get surveyRepeat =>
+      _t('Пройти опрос заново?', 'Take the survey again?', 'Сауалнамадан қайта өтесіз бе?');
+  String get printCards =>
+      _t('Распечатать набор карточек', 'Print the card set', 'Карточкалар жинағын басып шығару');
+  String get printFailed => _t(
+      'Не удалось открыть окно печати. Попробуйте ещё раз.',
+      'Could not open the print window. Please try again.',
+      'Басып шығару терезесі ашылмады. Қайталап көріңіз.');
+  String phaseLearning(BoardPhase phase) {
+    switch (phase) {
+      case BoardPhase.iiiA:
+        return _t('Ребёнок будет учиться выбирать нужную картинку из двух.',
+            'Your child will learn to choose the right picture out of two.',
+            'Бала екі суреттен керегін таңдауды үйренеді.');
+      case BoardPhase.iiiB:
+        return _t('Ребёнок будет учиться находить нужную картинку среди многих.',
+            'Your child will learn to find the right picture among many.',
+            'Бала керек суретті көптің ішінен табуды үйренеді.');
+      case BoardPhase.iv:
+        return _t('Ребёнок будет учиться составлять фразу «Я хочу + предмет».',
+            'Your child will learn to build the phrase "I want + item".',
+            'Бала «Мен қалаймын + зат» сөйлемін құруды үйренеді.');
+      case BoardPhase.ivPlus:
+        return _t('Ребёнок будет учиться добавлять к просьбе цвет и размер.',
+            'Your child will learn to add a colour and size to a request.',
+            'Бала өтінішіне түс пен өлшемді қосуды үйренеді.');
+      case BoardPhase.v:
+        return _t('Ребёнок будет учиться отвечать на вопрос «Что ты хочешь?».',
+            'Your child will learn to answer the question "What do you want?".',
+            'Бала «Не қалайсың?» сұрағына жауап беруді үйренеді.');
+      case BoardPhase.vi:
+        return _t('Ребёнок будет учиться рассказывать о том, что видит и слышит.',
+            'Your child will learn to talk about what they see and hear.',
+            'Бала көргені мен естігені туралы айтуды үйренеді.');
+    }
+  }
+
+  // Совет на сегодня. ЧЕРНОВИК: тексты должен проверить специалист.
+  String get tipTitle => _t('Совет на сегодня', "Today's tip", 'Бүгінгі кеңес');
+  String phaseTip(BoardPhase phase) {
+    switch (phase) {
+      case BoardPhase.iiiA:
+        return _t(
+            'Положите рядом любимую вещь ребёнка и нейтральную. Когда ребёнок нажмёт на карточку, сразу дайте то, что на ней, и назовите вслух. Если выбрал нейтральную, тоже спокойно дайте её, без замечаний.',
+            "Put your child's favourite item next to a neutral one. When your child taps a card, give them what is on it right away and name it aloud. If they chose the neutral one, calmly give that too, without comment.",
+            'Баланың сүйікті заты мен бейтарап затты қатар қойыңыз. Бала карточканы басқанда, ондағы затты бірден беріп, дауыстап атаңыз. Бейтарап затты таңдаса, оны да ескертусіз, сабырмен беріңіз.');
+      case BoardPhase.iiiB:
+        return _t(
+            'Начните с небольшого числа карточек и добавляйте понемногу, когда ребёнок уверенно находит нужную. Не переставляйте карточки без причины. Дайте предмет сразу, как только ребёнок его выбрал.',
+            'Start with a small number of cards and add a few more once your child finds the right one confidently. Do not move cards around without a reason. Give the item as soon as your child chooses it.',
+            'Аз карточкадан бастап, бала керегін сенімді тапқанда, біртіндеп қосыңыз. Карточкалардың орнын себепсіз ауыстырмаңыз. Бала таңдаған затты бірден беріңіз.');
+      case BoardPhase.iv:
+        return _t(
+            'Оставьте любимую вещь на виду, но вне досягаемости. Ждите, пока ребёнок сам соберёт фразу. Не говорите «скажи», просто ответьте на фразу.',
+            'Leave a favourite item in sight but out of reach. Wait for your child to build the phrase on their own. Do not say "say it", simply respond to the phrase.',
+            'Сүйікті затты көрінетін, бірақ қол жетпейтін жерге қойыңыз. Баланың сөйлемді өзі құрауын күтіңіз. «Айт» демеңіз, сөйлемге жай ғана жауап беріңіз.');
+      case BoardPhase.ivPlus:
+        return _t(
+            'Держите рядом похожие вещи: большой и маленький мяч, красную и синюю чашку. Дождитесь, пока ребёнок сам добавит описание. Дайте именно то, что он попросил, и повторите фразу вслух.',
+            'Keep similar items close: a big and a small ball, a red and a blue cup. Wait for your child to add a description on their own. Give exactly what they asked for and repeat the phrase aloud.',
+            'Ұқсас заттарды жақын ұстаңыз: үлкен және кішкентай доп, қызыл және көк кесе. Баланың сипаттаманы өзі қосуын күтіңіз. Ол сұрағанын дәл беріп, сөйлемді дауыстап қайталаңыз.');
+      case BoardPhase.v:
+        return _t(
+            'В спокойный момент нажмите «Задать вопрос» и подождите несколько секунд, не подсказывая. Когда ребёнок ответит фразой, сразу дайте предмет. Просьбы без вопроса тоже выполняйте.',
+            'At a calm moment, tap "Ask a question" and wait a few seconds without prompting. When your child answers with a phrase, give the item right away. Respond to requests made without a question too.',
+            'Тыныш сәтте «Сұрақ қою» түймесін басып, ештеңе айтпай бірнеше секунд күтіңіз. Бала сөйлеммен жауап бергенде, затты бірден беріңіз. Сұрақсыз айтылған өтініштерді де орындаңыз.');
+      case BoardPhase.vi:
+        return _t(
+            'Когда рядом есть что-то интересное, нажмите «Что ты видишь?». Отвечайте разговором, а не предметом: «Да, это собака! Большая». Не требуйте ответа каждый раз.',
+            'When there is something interesting nearby, tap "What do you see?". Respond with conversation, not an item: "Yes, it is a dog! A big one". Do not expect an answer every time.',
+            'Жақын жерде қызық нәрсе болса, «Не көріп тұрсың?» түймесін басыңыз. Затпен емес, әңгімемен жауап беріңіз: «Иә, бұл ит! Үлкен екен». Әр кезде жауап талап етпеңіз.');
+    }
+  }
 }

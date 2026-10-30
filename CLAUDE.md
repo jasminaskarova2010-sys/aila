@@ -34,7 +34,7 @@ flutter pub get             # install dependencies after editing pubspec.yaml
 flutter analyze lib/        # static analysis — run after every change, must be clean (infos like deprecated withOpacity are pre-existing and OK)
 flutter run -d macos        # run on macOS desktop (primary dev target used in this repo)
 flutter devices             # list available run targets
-flutter test                # widget/unit tests in test/ (stage1_test.dart: persistence, profile, PIN, stars, speak game, all games open)
+flutter test                # widget/unit tests in test/, по файлу на этап (stage1_test.dart, stage2_test.dart, stage3_test.dart)
 ```
 
 There is no CI config. `flutter_tts` has no test implementation — tests that open screens using TTS mock the `flutter_tts` MethodChannel.
@@ -98,6 +98,16 @@ Answer feedback in games is intentionally non-alarming: wrong answers get a neut
 - `parent_media.dart` — папка с фото и записями карточек родителя. В профиле только имена файлов.
 
 Слово «PECS» в интерфейсе не используется (П9). Папка `assets/pecs_symbols/` и `lib/pecs/pictograms.dart` (последнее нужно играм) сохранили старые имена.
+
+### Опрос родителя (`lib/survey/`, `lib/parent/print_cards.dart`)
+
+Порядок первого запуска: профиль → PIN → `SurveyScreen(firstRun: true)` → результат → `MainScreen`. Новый профиль из настроек тоже сразу идёт на опрос. Опрос можно отложить («Пройти позже») и пройти из настроек.
+
+- `survey_data.dart` — `calculateSurveyResult`: правила расчёта фазы из ТЗ. Если на вопрос 1 или 2 ответ не «Почти всегда», опрос сразу заканчивается экраном `SurveySpecialistScreen`: остальные ответы на результат не влияют.
+- Опрос сохраняет ответы и дату (`saveSurvey`), но **фазу сам не меняет**: она применяется только после подтверждения на экране результата. Со стрелкой «назад» фаза остаётся прежней.
+- Вопросы (`S.surveyQuestion`) и советы (`S.phaseTip`) — **черновик**, их должен проверить специалист.
+- `isSurveyDue` — через 28 дней после опроса пункт в настройках становится «Пройти опрос заново?».
+- `print_cards.dart` — PDF A4 с 12 карточками (`kPrintCardIds`), подписи на языке профиля. Шрифт Roboto лежит в `assets/fonts/`, в нём есть все казахские буквы, PDF собирается без интернета. Пакет `printing` открывает окно печати.
 
 ### Wardrobe / rewards (`lib/wardrobe_screen.dart`, `lib/wardrobe/wardrobe_items.dart`)
 

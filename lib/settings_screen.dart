@@ -6,8 +6,10 @@ import 'l10n/app_language.dart';
 import 'l10n/strings.dart';
 import 'parent/board_settings_screen.dart';
 import 'parent/pin_screens.dart';
+import 'parent/print_cards.dart';
 import 'parent/profile_form_screen.dart';
 import 'state/app_state.dart';
+import 'survey/survey_screen.dart';
 import 'support_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -46,12 +48,6 @@ class SettingsScreen extends StatelessWidget {
                         icon: Icons.star,
                         iconColor: const Color(0xFFE0A93E),
                         value: '${appState.stars}',
-                      ),
-                      const SizedBox(width: 10),
-                      _StatPill(
-                        icon: Icons.diamond,
-                        iconColor: const Color(0xFF8677A5),
-                        value: '5653',
                       ),
                     ],
                   ),
@@ -118,6 +114,45 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 28),
+              if (activeProfile != null) ...[
+                _SectionTitle(s.tipTitle),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF2EEF9),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    s.phaseTip(activeProfile.boardPhase),
+                    style: const TextStyle(
+                      color: Color(0xFF331A47),
+                      fontSize: 15,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _SettingsCard(
+                  children: [
+                    _NavigationRow(
+                      icon: Icons.checklist_rounded,
+                      label: appState.isSurveyDue()
+                          ? s.surveyRepeat
+                          : s.surveyOpen,
+                      onTap: () => _push(context, const SurveyScreen()),
+                    ),
+                    const _RowDivider(),
+                    _NavigationRow(
+                      icon: Icons.print_outlined,
+                      label: s.printCards,
+                      onTap: () => printBaseCards(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+              ],
               _SectionTitle(s.sectionGeneral),
               const SizedBox(height: 12),
               _SettingsCard(

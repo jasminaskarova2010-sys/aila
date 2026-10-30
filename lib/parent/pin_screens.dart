@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../l10n/strings.dart';
-import '../main_screen.dart';
 import '../state/app_state.dart';
+import '../survey/survey_screen.dart';
 
 const int kPinLength = 4;
 
@@ -20,7 +20,7 @@ Future<void> openParentArea(BuildContext context, WidgetBuilder builder) {
   );
 }
 
-/// Задать PIN. При первом запуске после этого открывается приложение;
+/// Задать PIN. При первом запуске после этого открывается опрос родителя;
 /// при сбросе или смене PIN экран закрывается с результатом `true`.
 class PinSetupScreen extends StatefulWidget {
   final bool isReset;
@@ -58,7 +58,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
       Navigator.of(context).pop(true);
     } else {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainScreen()),
+        MaterialPageRoute(builder: (_) => const SurveyScreen(firstRun: true)),
         (route) => false,
       );
     }

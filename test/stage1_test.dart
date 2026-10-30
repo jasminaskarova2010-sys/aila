@@ -88,6 +88,11 @@ void main() {
     expect(find.text('Введите этот PIN ещё раз'), findsOneWidget);
     await enterPin(tester, '1234');
 
+    // После PIN открывается опрос родителя (этап 3), его можно отложить.
+    expect(find.text('Опрос для родителя'), findsOneWidget);
+    await tester.tap(find.text('Пройти позже'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Привет, Айла!'), findsOneWidget);
     expect(state.hasPin, isTrue);
 

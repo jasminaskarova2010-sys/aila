@@ -18,6 +18,8 @@ dependencies:
   record: ^7.1.2
   audioplayers: ^6.8.1
   path_provider: ^2.1.6
+  pdf: ^3.13.1
+  printing: ^5.15.1
 
 
 dev_dependencies:
@@ -48,4 +50,6 @@ flutter:
     - assets/games/daily-life/getting_dressed.PNG
     - assets/pecs_symbols/
     - assets/pictograms/arasaac/
+    - assets/fonts/Roboto-Regular.ttf
+    - assets/fonts/Roboto-Bold.ttf
 
