@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../board/board_words.dart';
+import '../journal/journal.dart';
 import '../l10n/app_language.dart';
 import '../survey/survey_data.dart';
 
@@ -31,6 +32,9 @@ class ChildProfile {
   final Set<BoardCategory> hiddenCategories;
   final List<ParentCard> parentCards;
 
+  /// Игры: перерыв после стольких заданий (3–5).
+  int breakAfterTasks;
+
   // Опрос родителя
   List<SurveyAnswer> surveyAnswers;
   DateTime? lastSurveyAt;
@@ -53,6 +57,7 @@ class ChildProfile {
     Set<String>? hiddenWordIds,
     Set<BoardCategory>? hiddenCategories,
     List<ParentCard>? parentCards,
+    this.breakAfterTasks = 4,
     List<SurveyAnswer>? surveyAnswers,
     this.lastSurveyAt,
   }) : ownedOutfitIds = ownedOutfitIds ?? {'default'},
@@ -80,6 +85,7 @@ class ChildProfile {
     'hiddenWordIds': hiddenWordIds.toList(),
     'hiddenCategories': hiddenCategories.map((c) => c.name).toList(),
     'parentCards': parentCards.map((c) => c.toJson()).toList(),
+    'breakAfterTasks': breakAfterTasks,
     'surveyAnswers': surveyAnswers.map((a) => a.name).toList(),
     'lastSurveyAt': lastSurveyAt?.toIso8601String(),
   };
@@ -120,6 +126,7 @@ class ChildProfile {
     parentCards: (json['parentCards'] as List? ?? [])
         .map((c) => ParentCard.fromJson(c as Map<String, dynamic>))
         .toList(),
+    breakAfterTasks: json['breakAfterTasks'] as int? ?? 4,
     surveyAnswers: [
       for (final name in (json['surveyAnswers'] as List? ?? []).cast<String>())
         for (final answer in SurveyAnswer.values)
@@ -134,6 +141,10 @@ class ChildProfile {
 /// изменении.
 class AppState extends ChangeNotifier {
   static const _storageKey = 'aila_state_v1';
+  // Журнал лежит отдельно: он растёт, а состояние сохраняется при каждом
+  // изменении.
+  static const _journalKey = 'aila_journal_v1';
+  static const _journalLimit = 5000;
 
   final SharedPreferences _prefs;
   final List<ChildProfile> _profiles;
@@ -142,6 +153,7 @@ class AppState extends ChangeNotifier {
   bool _soundEnabled;
   bool _musicEnabled;
   bool _vibrationEnabled;
+  late final List<JournalEntry> _journal = _loadJournal();
 
   AppState._(
     this._prefs, {
@@ -180,6 +192,31 @@ class AppState extends ChangeNotifier {
       debugPrint('Не удалось прочитать сохранённое состояние: $e');
       return AppState._(prefs, profiles: []);
     }
+  }
+
+  List<JournalEntry> _loadJournal() {
+    final raw = _prefs.getString(_journalKey);
+    if (raw == null) return [];
+    try {
+      return [
+        for (final item in jsonDecode(raw) as List)
+          ?JournalEntry.fromJson(item as Map<String, dynamic>),
+      ];
+    } catch (e) {
+      debugPrint('Не удалось прочитать журнал: $e');
+      return [];
+    }
+  }
+
+  void _addToJournal(JournalEntry entry) {
+    _journal.add(entry);
+    if (_journal.length > _journalLimit) {
+      _journal.removeRange(0, _journal.length - _journalLimit);
+    }
+    _prefs.setString(
+      _journalKey,
+      jsonEncode(_journal.map((e) => e.toJson()).toList()),
+    );
   }
 
   void _changed() {
@@ -337,8 +374,48 @@ class AppState extends ChangeNotifier {
     _changed();
   }
 
-  void setBoardPhase(BoardPhase phase) =>
-      _updateBoard((p) => p.boardPhase = phase);
+  void setBoardPhase(BoardPhase phase) => _updateBoard((p) {
+    if (p.boardPhase == phase) return;
+    p.boardPhase = phase;
+    _addToJournal(
+      JournalEntry(
+        time: DateTime.now(),
+        profileId: p.id,
+        isPhaseChange: true,
+        phase: phase,
+      ),
+    );
+  });
+
+  void setBreakAfterTasks(int count) =>
+      _updateBoard((p) => p.breakAfterTasks = count);
+
+  // Журнал (текущего профиля)
+
+  List<JournalEntry> get journalEntries => _journal
+      .where((e) => e.profileId == activeProfile?.id)
+      .toList();
+
+  /// Фраза, сказанная на доске. Экранам незачем перерисовываться из-за записи.
+  void logPhrase({
+    required String text,
+    required int cards,
+    bool isAnswer = false,
+    DateTime? now,
+  }) {
+    final profile = activeProfile;
+    if (profile == null) return;
+    _addToJournal(
+      JournalEntry(
+        time: now ?? DateTime.now(),
+        profileId: profile.id,
+        text: text,
+        cards: cards,
+        isAnswer: isAnswer,
+        phase: profile.boardPhase,
+      ),
+    );
+  }
 
   void setAdultHintEnabled(bool value) =>
       _updateBoard((p) => p.adultHintEnabled = value);

@@ -1,10 +1,15 @@
 // lib/games/games_flow_screen.dart
 
 import 'package:flutter/material.dart';
+import '../board/board_speech.dart';
+import '../l10n/app_language.dart';
 import '../l10n/strings.dart';
 import '../state/app_state.dart';
+import 'break_screen.dart';
+import 'build_phrase_screen.dart';
 import 'categorize_game_screen.dart';
 import 'choice_game_screen.dart';
+import 'find_picture_screen.dart';
 import 'game_models.dart';
 import 'order_game_screen.dart';
 import 'speak_game_screen.dart';
@@ -21,8 +26,16 @@ class GamesFlowScreen extends StatefulWidget {
 }
 
 class _GamesFlowScreenState extends State<GamesFlowScreen> {
+  final BoardSpeech _speech = BoardSpeech();
   late int _currentIndex;
   int _earnedStars = 0;
+  List<GameStep> _steps = const [];
+  String? _stepsKey;
+  AppLanguage? _speechLanguage;
+
+  /// Заданий с прошлого перерыва.
+  int _sinceBreak = 0;
+  bool _onBreak = false;
 
   @override
   void initState() {
@@ -30,10 +43,63 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
     _currentIndex = widget.startIndex;
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final language = AppLocaleScope.of(context).language;
+    if (_speechLanguage != language) {
+      _speechLanguage = language;
+      _checkVoice(language);
+    }
+    _refreshSteps();
+  }
+
+  Future<void> _checkVoice(AppLanguage language) async {
+    final available = await _speech.setLanguage(language);
+    if (available || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 6),
+        content: Text(S.of(context).noVoiceMessage),
+      ),
+    );
+  }
+
+  /// Родитель может сменить язык, фазу или скрыть карточки прямо из игры
+  /// (настройки за PIN). Тогда задания собираются заново, текущее остаётся.
+  void _refreshSteps() {
+    final profile = AppStateScope.of(context).activeProfile;
+    final key = [
+      AppLocaleScope.of(context).language.name,
+      profile?.id,
+      profile?.boardPhase.name,
+      profile?.hiddenWordIds.join(','),
+      profile?.hiddenCategories.map((c) => c.name).join(','),
+      profile?.parentCards.length,
+    ].join('|');
+    if (key == _stepsKey) return;
+    final currentId = _steps.isEmpty ? null : _steps[_currentIndex].id;
+    _stepsKey = key;
+    _steps = gameStepsFor(context);
+    final kept = _steps.indexWhere((step) => step.id == currentId);
+    _currentIndex = kept >= 0
+        ? kept
+        : _currentIndex.clamp(0, _steps.length - 1);
+  }
+
+  @override
+  void dispose() {
+    _speech.dispose();
+    super.dispose();
+  }
+
   void _handleComplete() {
     final appState = AppStateScope.of(context);
     // Звёзды даются только за первое прохождение задания.
-    final awarded = appState.completeGame(_currentIndex, kStarsPerGame);
+    final awarded = appState.completeGame(
+      _steps[_currentIndex].id,
+      kStarsPerGame,
+    );
     if (awarded) {
       _earnedStars += kStarsPerGame;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,11 +125,20 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
   }
 
   void _goNext() {
-    if (_currentIndex + 1 < kGameSteps.length) {
-      setState(() => _currentIndex++);
+    if (_currentIndex + 1 >= _steps.length) {
+      _finish();
       return;
     }
-    _finish();
+    final breakAfter =
+        AppStateScope.of(context).activeProfile?.breakAfterTasks ?? 4;
+    setState(() {
+      _currentIndex++;
+      _sinceBreak++;
+      if (_sinceBreak >= breakAfter) {
+        _sinceBreak = 0;
+        _onBreak = true;
+      }
+    });
   }
 
   Future<void> _finish() async {
@@ -95,35 +170,56 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final step = kGameSteps[_currentIndex];
-    final total = kGameSteps.length;
+    if (_onBreak) {
+      return BreakScreen(onContinue: () => setState(() => _onBreak = false));
+    }
+    final step = _steps[_currentIndex];
+    final total = _steps.length;
     switch (step.kind) {
-      case GameKind.choice:
-        return ChoiceGameScreen(
-          key: ValueKey(step.index),
+      case GameKind.findPicture:
+        return FindPictureScreen(
+          key: ValueKey(step.id),
           step: step,
           total: total,
+          speech: _speech,
+          onComplete: _handleComplete,
+        );
+      case GameKind.buildPhrase:
+        return BuildPhraseScreen(
+          key: ValueKey(step.id),
+          step: step,
+          total: total,
+          speech: _speech,
+          onComplete: _handleComplete,
+        );
+      case GameKind.choice:
+        return ChoiceGameScreen(
+          key: ValueKey(step.id),
+          step: step,
+          total: total,
+          speech: _speech,
           onComplete: _handleComplete,
         );
       case GameKind.order:
         return OrderGameScreen(
-          key: ValueKey(step.index),
+          key: ValueKey(step.id),
           step: step,
           total: total,
           onComplete: _handleComplete,
         );
       case GameKind.categorize:
         return CategorizeGameScreen(
-          key: ValueKey(step.index),
+          key: ValueKey(step.id),
           step: step,
           total: total,
           onComplete: _handleComplete,
         );
       case GameKind.speak:
         return SpeakGameScreen(
-          key: ValueKey(step.index),
+          key: ValueKey(step.id),
           step: step,
           total: total,
+          speech: _speech,
           onComplete: _handleComplete,
           onSkip: _handleSkip,
         );

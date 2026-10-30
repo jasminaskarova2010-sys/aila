@@ -1,6 +1,7 @@
 // lib/widgets/journey_tab.dart
 
 import 'package:flutter/material.dart';
+import '../games/game_models.dart';
 import '../games/games_flow_screen.dart';
 import '../games/journey_titles_sheet.dart';
 import '../l10n/strings.dart';
@@ -20,16 +21,18 @@ class _JourneyTabState extends State<JourneyTab> {
 
   static const List<Offset> _nodePositions = [
     Offset(0.50, 0.03),
-    Offset(0.32, 0.16),
-    Offset(0.26, 0.29),
-    Offset(0.34, 0.42),
-    Offset(0.50, 0.53),
-    Offset(0.32, 0.66),
-    Offset(0.26, 0.79),
-    Offset(0.34, 0.92),
+    Offset(0.32, 0.13),
+    Offset(0.26, 0.23),
+    Offset(0.34, 0.33),
+    Offset(0.50, 0.43),
+    Offset(0.32, 0.53),
+    Offset(0.26, 0.63),
+    Offset(0.34, 0.73),
+    Offset(0.50, 0.83),
+    Offset(0.32, 0.93),
   ];
 
-  static const double _pathHeight = 1000;
+  static const double _pathHeight = 1250;
 
   static IconData _iconFor(int i) {
     switch (i % 4) {
@@ -69,6 +72,8 @@ class _JourneyTabState extends State<JourneyTab> {
   Widget build(BuildContext context) {
     final s = S.of(context);
     final appState = AppStateScope.of(context);
+    final stepCount = gameStepsFor(context).length;
+    final nodes = _nodePositions.take(stepCount).toList();
     return Scaffold(
       body: Stack(
         children: [
@@ -204,12 +209,10 @@ class _JourneyTabState extends State<JourneyTab> {
                                   Positioned.fill(
                                     child: CustomPaint(
                                       painter: _JourneyPathPainter(
-                                          nodes: _nodePositions),
+                                          nodes: nodes),
                                     ),
                                   ),
-                                  for (var i = 0;
-                                      i < _nodePositions.length;
-                                      i++)
+                                  for (var i = 0; i < nodes.length; i++)
                                     _buildNode(context, size, i),
                                   Positioned(
                                     right: 20,

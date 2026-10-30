@@ -1,6 +1,7 @@
 // lib/games/game_shell.dart
 
 import 'package:flutter/material.dart';
+import '../l10n/strings.dart';
 import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
 import 'missing_photo_placeholder.dart';
@@ -247,17 +248,17 @@ class _FeedbackBar extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Продолжить',
-                      style: TextStyle(
+                  Text(S.of(context).continueButton,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       )),
-                  SizedBox(width: 6),
-                  Icon(Icons.chevron_right, color: Colors.white),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.chevron_right, color: Colors.white),
                 ],
               ),
             ),
@@ -323,12 +324,12 @@ class GamePromptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (imagePath == null && pictogramBuilder == null && placeholderNote == null) {
-      return const SizedBox.shrink();
-    }
+    final hasVisual =
+        imagePath != null || pictogramBuilder != null || placeholderNote != null;
+    if (!hasVisual && speech == null) return const SizedBox.shrink();
     return Column(
       children: [
-        ClipRRect(
+        if (hasVisual) ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Container(
             width: double.infinity,

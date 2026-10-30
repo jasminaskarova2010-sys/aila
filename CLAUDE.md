@@ -34,7 +34,7 @@ flutter pub get             # install dependencies after editing pubspec.yaml
 flutter analyze lib/        # static analysis — run after every change, must be clean (infos like deprecated withOpacity are pre-existing and OK)
 flutter run -d macos        # run on macOS desktop (primary dev target used in this repo)
 flutter devices             # list available run targets
-flutter test                # widget/unit tests in test/, по файлу на этап (stage1_test.dart, stage2_test.dart, stage3_test.dart)
+flutter test                # widget/unit tests in test/, по файлу на этап (stage1_test.dart … stage4_test.dart)
 ```
 
 There is no CI config. `flutter_tts` has no test implementation — tests that open screens using TTS mock the `flutter_tts` MethodChannel.
@@ -77,11 +77,13 @@ Hand-rolled, not `flutter gen-l10n`/ARB-based. `AppLanguage` enum (ru/en/kk) + `
 
 ### Games (`lib/games/`)
 
-`game_models.dart` defines `GameStep` (one config class covering all 4 game kinds: `choice`, `order`, `categorize`, `speak`) and the ordered `kGameSteps` list — this list **is** the day's "journey" (8 steps). `GamesFlowScreen` walks through `kGameSteps` sequentially, rendering the right screen widget per `GameKind` (`choice_game_screen.dart`, `order_game_screen.dart`, `categorize_game_screen.dart`, `speak_game_screen.dart`), all built on the shared `GameShell` scaffold (`game_shell.dart`) for consistent header/progress/feedback chrome. `journey_titles_sheet.dart` is the bottom sheet listing all steps by title (opened from `HomeTab` and `JourneyTab`), letting the user jump into any step directly via `GamesFlowScreen(startIndex: i)`.
+`game_models.dart` defines `GameStep` (one config class for all kinds: `choice`, `order`, `categorize`, `speak`, `findPicture`, `buildPhrase`) and `buildGameSteps(S, BoardModel)` / `gameStepsFor(context)`: задания дня собираются под язык и профиль. Новых констант с текстами заданий не заводить: все тексты через `S`. `GameStep.id` — постоянный номер задания, по нему хранится прохождение (`completeGame(id)`), порядок и номер на экране (`index`) могут меняться. `GamesFlowScreen` идёт по заданиям, показывает перерыв (`BreakScreen`, таймера нет) после `breakAfterTasks` заданий (3–5, настройка родителя) и держит одну `BoardSpeech` на все экраны: озвучка на языке профиля, без голоса — сообщение родителю. Все экраны построены на общем `GameShell`. `journey_titles_sheet.dart` lets the user jump to any step via `GamesFlowScreen(startIndex: i)`, где `i` — позиция в списке для текущего профиля.
+
+**Игры на словах доски** (`findPicture`, `buildPhrase`, сортировка, «Что хочет сказать Айла?», «Повтори фразу») берут слова только из `BoardModel.gameObjects`/`visibleDescriptions`: скрытая родителем карточка или категория в них не появляется, а если карточек не хватает, задание пропускается. «Собери фразу» есть только с фазы IV. Задания на фото (эмоции, истории, последовательность, «Что делать?») и «Куда смотрит Айла?» учат ситуациям и остаются своим контентом.
 
 The speak game is "Тренировка вместе с родителем": there is no speech recognition (out of MVP scope), so it must never auto-succeed. The app speaks `speakPhrase` via `flutter_tts` on tap of «Послушать», and the **adult** taps «Получилось» (→ normal success feedback → `onComplete`) or «Попробуем потом» (→ `onSkip`: next step, no stars, step stays uncompleted, neutral snackbar, no error state).
 
-**Visual content policy for game steps**: each `GameStep`'s imagery resolves in priority order — real photo (`imagePath`, files under `assets/games/<category>/`) → simple vector illustration (`pictogramBuilder`, hand-drawn `CustomPainter`s in `game_pictograms.dart` / `pecs/pictograms.dart`, used only for neutral objects where an abstract illustration can't distort meaning) → explicit "photo needed" placeholder (`promptPlaceholderNote` → `MissingPhotoPlaceholder`) when neither exists yet. **Never fall back to emoji for instructional content** — this was a deliberate, explicit product decision. Decorative chrome (background clouds/rocket, wardrobe icons, dialog titles) is exempt from this rule and may use emoji/Material icons freely.
+**Visual content policy for game steps**: each `GameStep`'s imagery resolves in priority order — real photo (`imagePath`, files under `assets/games/<category>/`) → simple vector illustration (`pictogramBuilder`, hand-drawn `CustomPainter`s in `game_pictograms.dart`, used only for neutral objects where an abstract illustration can't distort meaning) → explicit "photo needed" placeholder (`promptPlaceholderNote` → `MissingPhotoPlaceholder`) when neither exists yet. **Never fall back to emoji for instructional content** — this was a deliberate, explicit product decision. Decorative chrome (background clouds/rocket, wardrobe icons, dialog titles) is exempt from this rule and may use emoji/Material icons freely.
 
 Answer feedback in games is intentionally non-alarming: wrong answers get a neutral gray/muted "Попробуй ещё раз" prompt, never a red X or red text — this was also an explicit, deliberate ASD-friendly design decision; don't reintroduce red error states.
 
@@ -97,7 +99,7 @@ Answer feedback in games is intentionally non-alarming: wrong answers get a neut
 - `board_speech.dart` — озвучка на языке профиля (`flutter_tts`, скорость 0.42). Запись голоса родителя важнее синтеза. Если голоса для языка нет, родитель видит сообщение.
 - `parent_media.dart` — папка с фото и записями карточек родителя. В профиле только имена файлов.
 
-Слово «PECS» в интерфейсе не используется (П9). Папка `assets/pecs_symbols/` и `lib/pecs/pictograms.dart` (последнее нужно играм) сохранили старые имена.
+Слово «PECS» в интерфейсе не используется (П9). Папка `assets/pecs_symbols/` сохранила старое имя.
 
 ### Опрос родителя (`lib/survey/`, `lib/parent/print_cards.dart`)
 
@@ -108,6 +110,10 @@ Answer feedback in games is intentionally non-alarming: wrong answers get a neut
 - Вопросы (`S.surveyQuestion`) и советы (`S.phaseTip`) — **черновик**, их должен проверить специалист.
 - `isSurveyDue` — через 28 дней после опроса пункт в настройках становится «Пройти опрос заново?».
 - `print_cards.dart` — PDF A4 с 12 карточками (`kPrintCardIds`), подписи на языке профиля. Шрифт Roboto лежит в `assets/fonts/`, в нём есть все казахские буквы, PDF собирается без интернета. Пакет `printing` открывает окно печати.
+
+### Журнал для пилота (`lib/journal/journal.dart`, `lib/parent/today_screen.dart`)
+
+Только на устройстве (П7): отдельный ключ `aila_journal_v1` в `shared_preferences`, последние 5000 записей, у каждого профиля свои. Фраза записывается по «Сказать», а в фазах III — по нажатию на карточку (`logPhrase`); смена фазы — в `setBoardPhase`. Ответом считается первая фраза в течение 2 минут после кнопки вопроса (`kAnswerWindow`). «Я хочу» считается карточкой. Экран «Сегодня» (настройки, за PIN) считает спонтанные фразы и фразы из 2+ карточек за день и за 7 дней. «Поделиться отчётом» — CSV через `share_plus`: разделитель `;`, метка UTF-8 для Excel, имени ребёнка нет.
 
 ### Wardrobe / rewards (`lib/wardrobe_screen.dart`, `lib/wardrobe/wardrobe_items.dart`)
 

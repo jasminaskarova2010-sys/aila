@@ -23,7 +23,10 @@ class BoardModel {
     return null;
   }
 
-  bool _visible(BoardWord word) => !profile.hiddenWordIds.contains(word.id);
+  /// Родитель не скрыл ни само слово, ни его категорию.
+  bool _visible(BoardWord word) =>
+      !profile.hiddenWordIds.contains(word.id) &&
+      !profile.hiddenCategories.contains(word.category);
 
   List<BoardWord> get favorites => [
     for (final id in profile.favoriteWordIds)
@@ -59,15 +62,36 @@ class BoardModel {
 
   /// Фаза III-A: любимый предмет и нейтральный.
   List<BoardWord> get twoCards {
-    final favorite = favorites.isEmpty ? boardWordById('apple')! : favorites.first;
-    final neutral = kNeutralWordIds
+    final objects = _objects;
+    if (objects.isEmpty) return const [];
+    final favorite = objects.first;
+    final neutrals = kNeutralWordIds
         .map((id) => boardWordById(id)!)
-        .firstWhere(
-          (w) => w.id != favorite.id,
-          orElse: () => boardWordById('book')!,
-        );
-    return [favorite, neutral];
+        .where((w) => _visible(w) && w.id != favorite.id);
+    final others = objects.skip(1);
+    return [
+      favorite,
+      if (neutrals.isNotEmpty)
+        neutrals.first
+      else if (others.isNotEmpty)
+        others.first,
+    ];
   }
+
+  /// Предметы для игр. Без стартовых людей: у них картинки-схемы, ребёнку трудно
+  /// отличить одну от другой. Люди с фото родителя в игры попадают.
+  List<BoardWord> get gameObjects => _allWords
+      .where(
+        (w) =>
+            w.kind == WordKind.noun &&
+            w.id != 'toilet' &&
+            (w.category != BoardCategory.people || w.isParentCard) &&
+            _visible(w),
+      )
+      .toList();
+
+  List<BoardWord> get visibleDescriptions =>
+      _allWords.where((w) => w.kind == WordKind.adjective && _visible(w)).toList();
 
   bool get showsCategories {
     if (phase == BoardPhase.iiiA) return false;

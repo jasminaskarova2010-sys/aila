@@ -1,6 +1,7 @@
 // lib/games/order_game_screen.dart
 
 import 'package:flutter/material.dart';
+import '../l10n/strings.dart';
 import 'game_models.dart';
 import 'game_shell.dart';
 
@@ -125,6 +126,7 @@ class _OrderGameScreenState extends State<OrderGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final step = widget.step;
     final hasReference = step.referenceItems.isNotEmpty;
 
@@ -149,9 +151,9 @@ class _OrderGameScreenState extends State<OrderGameScreen> {
               ),
               child: Column(
                 children: [
-                  const Text(
-                    'Смотри внимательно',
-                    style: TextStyle(
+                  Text(
+                    s.gameOrderWatch,
+                    style: const TextStyle(
                       color: Color(0xFF331A47),
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -169,9 +171,9 @@ class _OrderGameScreenState extends State<OrderGameScreen> {
             ),
             const SizedBox(height: 20),
           ],
-          const Text(
-            'Теперь повтори последовательность',
-            style: TextStyle(
+          Text(
+            s.gameOrderRepeat,
+            style: const TextStyle(
               color: Color(0xFF331A47),
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -252,7 +254,7 @@ class _OrderGameScreenState extends State<OrderGameScreen> {
           if (_wrong) ...[
             const SizedBox(height: 16),
             Text(
-              'Попробуй ещё раз',
+              s.gameTryAgain,
               style: TextStyle(
                 color: const Color(0xFF331A47).withOpacity(0.55),
                 fontSize: 14,
@@ -262,7 +264,7 @@ class _OrderGameScreenState extends State<OrderGameScreen> {
             const SizedBox(height: 8),
             TextButton(
               onPressed: _reset,
-              child: const Text('Сбросить'),
+              child: Text(s.gameOrderReset),
             ),
           ],
         ],

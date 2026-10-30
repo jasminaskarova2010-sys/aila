@@ -1,6 +1,7 @@
 // lib/games/journey_titles_sheet.dart
 
 import 'package:flutter/material.dart';
+import '../l10n/strings.dart';
 import 'game_models.dart';
 import 'games_flow_screen.dart';
 
@@ -16,6 +17,7 @@ void showJourneyTitlesSheet(BuildContext context) {
 class _JourneyTitlesSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final steps = gameStepsFor(context);
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFFFAF0EA),
@@ -34,11 +36,11 @@ class _JourneyTitlesSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Путешествие дня',
-              style: TextStyle(
+              S.of(context).journeyOfDay,
+              style: const TextStyle(
                 color: Color(0xFF331A47),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -52,10 +54,10 @@ class _JourneyTitlesSheet extends StatelessWidget {
             ),
             child: ListView.separated(
               shrinkWrap: true,
-              itemCount: kGameSteps.length,
+              itemCount: steps.length,
               separatorBuilder: (context, i) => const SizedBox(height: 10),
               itemBuilder: (context, i) {
-                final step = kGameSteps[i];
+                final step = steps[i];
                 return Material(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),

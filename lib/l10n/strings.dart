@@ -522,4 +522,185 @@ class S {
             'Жақын жерде қызық нәрсе болса, «Не көріп тұрсың?» түймесін басыңыз. Затпен емес, әңгімемен жауап беріңіз: «Иә, бұл ит! Үлкен екен». Әр кезде жауап талап етпеңіз.');
     }
   }
+
+  // Игры. Казахские тексты должен проверить носитель языка.
+  String get gameTryAgain => _t('Попробуй ещё раз', 'Try again', 'Тағы байқап көр');
+  String get gameChooseRight =>
+      _t('Выбери правильный вариант.', 'Choose the right option.', 'Дұрыс нұсқаны таңда.');
+  String get gameWellDone => _t('Молодец!', 'Well done!', 'Жарайсың!');
+  String get gameGreat => _t('Отлично!', 'Great!', 'Тамаша!');
+  String get gameGreatWork => _t('Отличная работа!', 'Great work!', 'Керемет жұмыс!');
+  String get gameClever => _t('Умница!', 'Clever!', 'Ақылдысың!');
+  String get gameListening => _t('Я тебя слушаю!', "I'm listening!", 'Мен сені тыңдап тұрмын!');
+
+  String get gameFindTitle => _t('Найди картинку', 'Find the picture', 'Суретті тап');
+  String get gameFindSubtitle =>
+      _t('Послушай слово и нажми на его карточку.', 'Listen to the word and tap its card.',
+          'Сөзді тыңдап, оның карточкасын бас.');
+  String gameFindPrompt(String word) => _t('Найди: $word', 'Find: $word', 'Тап: $word');
+  String get gameFindSuccess =>
+      _t('Ты нашёл все картинки!', 'You found all the pictures!', 'Сен барлық суретті таптың!');
+
+  String get gamePhraseTitle => _t('Собери фразу', 'Build the phrase', 'Сөйлем құра');
+  String get gamePhraseSubtitle =>
+      _t('Послушай фразу и нажми нужные карточки.', 'Listen to the phrase and tap the right cards.',
+          'Сөйлемді тыңдап, керекті карточкаларды бас.');
+  String get gamePhraseSuccess =>
+      _t('Ты собрал фразу!', 'You built the phrase!', 'Сен сөйлем құрадың!');
+
+  String get gameHappyTitle => _t('Кто счастлив?', 'Who is happy?', 'Кім бақытты?');
+  String get gameHappySubtitle =>
+      _t('Выбери мальчика, который счастлив.', 'Choose the boy who is happy.', 'Бақытты баланы таңда.');
+  String get gameHappySuccess => _t('Ты справился!', 'You did it!', 'Сен орындадың!');
+
+  String get gameStoryTitle => _t('Социальная история', 'Social story', 'Әлеуметтік әңгіме');
+  String get gameStorySubtitle => _t(
+      'Девочка пришла в магазин. Что нужно сделать?',
+      'A girl came to a shop. What should she do?',
+      'Қыз дүкенге келді. Не істеу керек?');
+  String get gameStoryWait => _t('Ждать очередь', 'Wait in line', 'Кезек күту');
+  String get gameStoryShout => _t('Кричать', 'Shout', 'Айқайлау');
+  String get gameStoryRun => _t('Убежать', 'Run away', 'Қашып кету');
+  String get gameStorySuccess => _t(
+      'Ждать очередь — это правильное и вежливое поведение!',
+      'Waiting in line is the right and polite thing to do!',
+      'Кезек күту — дұрыс әрі сыпайы мінез-құлық!');
+
+  String get gameLookTitle => _t('Куда смотрит Айла?', 'Where is Aila looking?', 'Айла қайда қарап тұр?');
+  String get gameLookSubtitle => _t(
+      'Посмотри, куда показывает Айла. Нажми на правильный предмет.',
+      'See where Aila is pointing. Tap the right object.',
+      'Айланың қайда көрсетіп тұрғанын қара. Дұрыс затты бас.');
+  String get gameLookPhotoNote => _t(
+      'Нужно фото: ребёнок показывает пальцем в небо (совместное внимание)',
+      'Photo needed: a child pointing at the sky (joint attention)',
+      'Сурет керек: бала аспанды саусағымен көрсетіп тұр (ортақ зейін)');
+  String get gameLookCaption => _t('Посмотри туда!', 'Look over there!', 'Анда қара!');
+  String get gameLookSuccess => _t(
+      'Айла показывает на самолёт! Ты отлично справился!',
+      'Aila is pointing at the plane! Great job!',
+      'Айла ұшақты көрсетіп тұр! Сен тамаша орындадың!');
+
+  String get gameOrderTitle =>
+      _t('Запомни последовательность', 'Remember the order', 'Ретін есте сақта');
+  String get gameOrderSubtitle => _t(
+      'Посмотри на последовательность действий.\nЗатем повтори её.',
+      'Look at the order of the actions.\nThen repeat it.',
+      'Әрекеттердің ретіне қара.\nСодан кейін қайтала.');
+  String get gameOrderWake => _t('Проснуться', 'Wake up', 'Ояну');
+  String get gameOrderTeeth => _t('Почистить зубы', 'Brush teeth', 'Тіс тазалау');
+  String get gameOrderBreakfast => _t('Позавтракать', 'Have breakfast', 'Таңғы ас ішу');
+  String get gameOrderDress => _t('Одеться', 'Get dressed', 'Киіну');
+  String get gameOrderWatch => _t('Смотри внимательно', 'Watch carefully', 'Мұқият қара');
+  String get gameOrderRepeat =>
+      _t('Теперь повтори последовательность', 'Now repeat the order', 'Енді ретін қайтала');
+  String get gameOrderReset => _t('Сбросить', 'Start over', 'Басынан бастау');
+  String get gameOrderSuccess => _t(
+      'Ты отлично запоминаешь последовательность!',
+      'You remember the order very well!',
+      'Сен ретін жақсы есте сақтайсың!');
+
+  String get gameSortTitle => _t('Еда или игрушки?', 'Food or toys?', 'Тамақ па, ойыншық па?');
+  String get gameSortSubtitle => _t(
+      'Перетащи картинки в правильную корзину.',
+      'Drag the pictures into the right basket.',
+      'Суреттерді дұрыс себетке сүйреп апар.');
+  String get gameSortSuccess => _t(
+      'Ты учишься сортировать предметы по категориям!',
+      'You are learning to sort things into categories!',
+      'Сен заттарды санаттарға бөлуді үйреніп жатырсың!');
+
+  String get gameSaysTitle =>
+      _t('Что хочет сказать Айла?', 'What does Aila want to say?', 'Айла не айтқысы келеді?');
+  String get gameSaysSubtitle => _t(
+      'Послушай фразу и выбери картинку, которая подходит.',
+      'Listen to the phrase and choose the matching picture.',
+      'Сөйлемді тыңдап, сәйкес суретті таңда.');
+  String gameSaysSuccess(String word) => _t(
+      '$word — это правильно! Давай продолжим!',
+      '$word is right! Let us go on!',
+      '$word — дұрыс! Жалғастырайық!');
+
+  String get gameRepeatTitle => _t('Повтори фразу', 'Repeat the phrase', 'Сөйлемді қайтала');
+  String get gameRepeatSubtitle => _t(
+      'Послушай фразу и повтори её.\nГовори чётко и спокойно.',
+      'Listen to the phrase and repeat it.\nSpeak clearly and calmly.',
+      'Сөйлемді тыңдап, қайтала.\nАнық әрі сабырмен сөйле.');
+  String get gameRepeatSuccess =>
+      _t('Отлично произнесено!', 'Nicely said!', 'Тамаша айтылды!');
+
+  String get gameDoTitle => _t('Что делать?', 'What to do?', 'Не істеу керек?');
+  String get gameDoSubtitle => _t(
+      'Послушай ситуацию и выбери лучший вариант.',
+      'Listen to the situation and choose the best option.',
+      'Жағдайды тыңдап, ең жақсы нұсқаны таңда.');
+  String get gameDoSpeech => _t(
+      'Друг упал на площадке и заплакал. Что ты будешь делать?',
+      'A friend fell on the playground and started crying. What will you do?',
+      'Досың алаңда құлап, жылап қалды. Не істейсің?');
+  String get gameDoLaugh => _t('Посмеяться и уйти', 'Laugh and walk away', 'Күліп, кетіп қалу');
+  String get gameDoLaughPhotoNote => _t(
+      'Нужно фото: ребёнок смеётся и уходит',
+      'Photo needed: a child laughs and walks away',
+      'Сурет керек: бала күліп, кетіп барады');
+  String get gameDoHelp => _t('Подойти и помочь', 'Go and help', 'Жақындап, көмектесу');
+  String get gameDoHelpPhotoNote => _t(
+      'Нужно фото: ребёнок подходит и протягивает руку',
+      'Photo needed: a child comes over and offers a hand',
+      'Сурет керек: бала жақындап, қолын созып тұр');
+  String get gameDoIgnore => _t(
+      'Пройти мимо, как будто ничего не случилось',
+      'Walk past as if nothing happened',
+      'Ештеңе болмағандай өтіп кету');
+  String get gameDoIgnorePhotoNote => _t(
+      'Нужно фото: ребёнок проходит мимо, не реагируя',
+      'Photo needed: a child walks past without reacting',
+      'Сурет керек: бала елемей өтіп барады');
+  String get gameDoSuccess => _t(
+      'Подойти и помочь — это правильный выбор!',
+      'Going to help is the right choice!',
+      'Жақындап, көмектесу — дұрыс таңдау!');
+
+  // Перерыв
+  String get breakTitle => _t('Время перерыва', 'Break time', 'Үзіліс уақыты');
+  String get breakBody => _t(
+      'Для взрослого: отдохните вместе. Когда ребёнок будет готов, нажмите «Продолжить».',
+      'For the adult: rest together. When your child is ready, tap "Continue".',
+      'Ересекке: бірге демалыңыз. Бала дайын болғанда, «Жалғастыру» түймесін басыңыз.');
+  String get breakAfterLabel =>
+      _t('Перерыв после заданий', 'Break after tasks', 'Тапсырмалардан кейін үзіліс');
+
+  // Экран «Сегодня» и отчёт
+  String get todayTitle => _t('Сегодня', 'Today', 'Бүгін');
+  String get todayDay => _t('За сегодня', 'Today', 'Бүгін');
+  String get todayWeek => _t('За 7 дней', 'Last 7 days', 'Соңғы 7 күн');
+  String get todaySpontaneous =>
+      _t('спонтанных фраз', 'spontaneous phrases', 'өз бетінше айтылған сөйлем');
+  String get todayMultiCard =>
+      _t('фраз из 2+ карточек', 'phrases of 2+ cards', '2+ карточкалы сөйлем');
+  String get todayExplanation => _t(
+      'Спонтанная фраза: ребёнок сказал сам, а не ответил на вопрос в течение 2 минут. «Я хочу» тоже считается карточкой. Данные хранятся только на этом устройстве.',
+      'A spontaneous phrase is one your child said on their own, not an answer to a question within 2 minutes. "I want" counts as a card too. The data stays only on this device.',
+      'Өз бетінше айтылған сөйлем: бала 2 минут ішіндегі сұраққа жауап бермей, өзі айтқан сөйлем. «Мен қалаймын» да карточка болып саналады. Деректер тек осы құрылғыда сақталады.');
+  String get todayShare => _t('Поделиться отчётом', 'Share the report', 'Есеппен бөлісу');
+  String get todayEmpty => _t(
+      'Отчёт появится, когда ребёнок скажет первую фразу на доске.',
+      'The report will appear after the first phrase on the board.',
+      'Есеп бала тақтада алғашқы сөйлемін айтқанда пайда болады.');
+  String get todayShareFailed => _t(
+      'Не удалось поделиться отчётом. Попробуйте ещё раз.',
+      'Could not share the report. Please try again.',
+      'Есеппен бөлісу мүмкін болмады. Қайталап көріңіз.');
+  List<String> get csvHeaders => [
+    _t('Дата и время', 'Date and time', 'Күні мен уақыты'),
+    _t('Тип', 'Type', 'Түрі'),
+    _t('Фраза', 'Phrase', 'Сөйлем'),
+    _t('Карточек', 'Cards', 'Карточка саны'),
+    _t('Как сказано', 'How it was said', 'Қалай айтылды'),
+    _t('Фаза', 'Phase', 'Кезең'),
+  ];
+  String get csvPhrase => _t('фраза', 'phrase', 'сөйлем');
+  String get csvPhaseChange => _t('смена фазы', 'phase change', 'кезең ауысуы');
+  String get csvAnswer => _t('ответ на вопрос', 'answer to a question', 'сұраққа жауап');
+  String get csvSpontaneous => _t('спонтанно', 'spontaneous', 'өз бетінше');
 }

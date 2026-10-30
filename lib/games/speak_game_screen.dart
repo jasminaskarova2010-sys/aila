@@ -1,7 +1,7 @@
 // lib/games/speak_game_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import '../board/board_speech.dart';
 import '../l10n/strings.dart';
 import '../widgets/primary_button.dart';
 import 'game_models.dart';
@@ -14,6 +14,7 @@ import 'game_shell.dart';
 class SpeakGameScreen extends StatefulWidget {
   final GameStep step;
   final int total;
+  final BoardSpeech speech;
   final VoidCallback onComplete;
   final VoidCallback onSkip;
 
@@ -21,6 +22,7 @@ class SpeakGameScreen extends StatefulWidget {
     super.key,
     required this.step,
     required this.total,
+    required this.speech,
     required this.onComplete,
     required this.onSkip,
   });
@@ -30,29 +32,9 @@ class SpeakGameScreen extends StatefulWidget {
 }
 
 class _SpeakGameScreenState extends State<SpeakGameScreen> {
-  final FlutterTts _tts = FlutterTts();
   bool _solved = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // Тексты игр пока только на русском; озвучка игр на языке профиля —
-    // этап 4 ТЗ.
-    _tts.setLanguage('ru-RU');
-    _tts.setSpeechRate(0.42);
-    _tts.setPitch(1.0);
-  }
-
-  @override
-  void dispose() {
-    _tts.stop();
-    super.dispose();
-  }
-
-  Future<void> _speak() async {
-    await _tts.stop();
-    await _tts.speak(widget.step.speakPhrase);
-  }
+  void _speak() => widget.speech.speakText(widget.step.speakPhrase);
 
   @override
   Widget build(BuildContext context) {

@@ -9,6 +9,24 @@ extension BoardPhaseChecks on BoardPhase {
   bool get hasDescriptions => index >= BoardPhase.ivPlus.index;
   bool get hasAskButton => index >= BoardPhase.v.index;
   bool get hasSeeQuestion => this == BoardPhase.vi;
+
+  /// Короткое название для отчёта.
+  String get code {
+    switch (this) {
+      case BoardPhase.iiiA:
+        return 'III-A';
+      case BoardPhase.iiiB:
+        return 'III-B';
+      case BoardPhase.iv:
+        return 'IV';
+      case BoardPhase.ivPlus:
+        return 'IV+';
+      case BoardPhase.v:
+        return 'V';
+      case BoardPhase.vi:
+        return 'VI';
+    }
+  }
 }
 
 enum BoardCategory {

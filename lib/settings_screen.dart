@@ -7,6 +7,7 @@ import 'l10n/strings.dart';
 import 'parent/board_settings_screen.dart';
 import 'parent/pin_screens.dart';
 import 'parent/print_cards.dart';
+import 'parent/today_screen.dart';
 import 'parent/profile_form_screen.dart';
 import 'state/app_state.dart';
 import 'survey/survey_screen.dart';
@@ -137,6 +138,12 @@ class SettingsScreen extends StatelessWidget {
                 _SettingsCard(
                   children: [
                     _NavigationRow(
+                      icon: Icons.insights_outlined,
+                      label: s.todayTitle,
+                      onTap: () => _push(context, const TodayScreen()),
+                    ),
+                    const _RowDivider(),
+                    _NavigationRow(
                       icon: Icons.checklist_rounded,
                       label: appState.isSurveyDue()
                           ? s.surveyRepeat
@@ -148,6 +155,40 @@ class SettingsScreen extends StatelessWidget {
                       icon: Icons.print_outlined,
                       label: s.printCards,
                       onTap: () => printBaseCards(context),
+                    ),
+                    const _RowDivider(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.self_improvement,
+                            color: Color(0xFF331A47),
+                            size: 22,
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text(
+                              s.breakAfterLabel,
+                              style: const TextStyle(
+                                color: Color(0xFF331A47),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          for (final count in const [3, 4, 5])
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: ChoiceChip(
+                                label: Text('$count'),
+                                selected: activeProfile.breakAfterTasks == count,
+                                onSelected: (_) =>
+                                    appState.setBreakAfterTasks(count),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

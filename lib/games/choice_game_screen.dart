@@ -1,6 +1,8 @@
 // lib/games/choice_game_screen.dart
 
 import 'package:flutter/material.dart';
+import '../board/board_speech.dart';
+import '../l10n/strings.dart';
 import 'game_models.dart';
 import 'game_shell.dart';
 import 'missing_photo_placeholder.dart';
@@ -8,12 +10,14 @@ import 'missing_photo_placeholder.dart';
 class ChoiceGameScreen extends StatefulWidget {
   final GameStep step;
   final int total;
+  final BoardSpeech speech;
   final VoidCallback onComplete;
 
   const ChoiceGameScreen({
     super.key,
     required this.step,
     required this.total,
+    required this.speech,
     required this.onComplete,
   });
 
@@ -33,13 +37,13 @@ class _ChoiceGameScreenState extends State<ChoiceGameScreen> {
   }
 
   void _playSpeech() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Озвучка появится позже')),
-    );
+    final text = widget.step.promptSpeech;
+    if (text != null) widget.speech.speakText(text);
   }
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final step = widget.step;
     return GameShell(
       index: step.index,
@@ -63,9 +67,9 @@ class _ChoiceGameScreenState extends State<ChoiceGameScreen> {
           if (step.promptImagePath != null ||
               step.promptPictogramBuilder != null ||
               step.promptPlaceholderNote != null)
-            const Text(
-              'Выбери правильный вариант.',
-              style: TextStyle(color: Color(0xFF9B8FAE), fontSize: 13),
+            Text(
+              s.gameChooseRight,
+              style: const TextStyle(color: Color(0xFF9B8FAE), fontSize: 13),
             ),
           if (step.promptImagePath != null ||
               step.promptPictogramBuilder != null ||
@@ -180,7 +184,7 @@ class _ChoiceGameScreenState extends State<ChoiceGameScreen> {
           if (_selected != null && !_solved) ...[
             const SizedBox(height: 14),
             Text(
-              'Попробуй ещё раз',
+              s.gameTryAgain,
               style: TextStyle(
                 color: const Color(0xFF331A47).withOpacity(0.55),
                 fontSize: 14,

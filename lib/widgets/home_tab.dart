@@ -23,8 +23,10 @@ class HomeTab extends StatelessWidget {
     final s = S.of(context);
     final appState = AppStateScope.of(context);
     final userName = _getUserDisplayName(s, appState);
-    final completedCount = appState.completedGamesCount;
-    final totalGames = kGameSteps.length;
+    final steps = gameStepsFor(context);
+    final completedCount =
+        steps.where((step) => appState.isGameCompleted(step.id)).length;
+    final totalGames = steps.length;
 
     return Scaffold(
       body: Stack(

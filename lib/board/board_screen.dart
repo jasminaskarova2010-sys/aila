@@ -14,6 +14,8 @@ import 'board_words.dart';
 import 'phrase_builder.dart';
 import 'pictogram_repository.dart';
 
+const Duration kAnswerWindow = Duration(minutes: 2);
+
 /// Доска общения. Сверху вниз: полоска фразы, стартовые фразы, закреплённая
 /// строка, сетка карточек текущей категории, панель категорий. Что именно видно,
 /// зависит от фазы в профиле ребёнка. Звёзды за доску не начисляются: общение
@@ -35,6 +37,9 @@ class _BoardScreenState extends State<BoardScreen> {
   AppLanguage? _speechLanguage;
   bool _noVoice = false;
   bool _seeded = false;
+
+  /// Когда взрослый последний раз задал вопрос (фазы V–VI).
+  DateTime? _questionAt;
 
   @override
   void didChangeDependencies() {
@@ -72,6 +77,10 @@ class _BoardScreenState extends State<BoardScreen> {
   void _onCardTap(BoardWord word) {
     _speech.speakWord(word);
     if (!_model.phase.hasStrip) {
+      AppStateScope.of(context).logPhrase(
+        text: S.of(context).boardLabel(word),
+        cards: 1,
+      );
       _showHint([word]);
       return;
     }
@@ -97,7 +106,20 @@ class _BoardScreenState extends State<BoardScreen> {
     final hasContent = _strip.any((w) => w.kind != WordKind.starter);
     if (!hasContent) return;
     _speech.speakPhrase(_strip);
+    AppStateScope.of(context).logPhrase(
+      text: buildPhrase(_strip, S.of(context).lang),
+      cards: _strip.length,
+      isAnswer: _takeQuestion(),
+    );
     _showHint(_strip);
+  }
+
+  /// Ответом считается первая фраза в течение 2 минут после вопроса.
+  bool _takeQuestion() {
+    final askedAt = _questionAt;
+    _questionAt = null;
+    if (askedAt == null) return false;
+    return DateTime.now().difference(askedAt) <= kAnswerWindow;
   }
 
   void _eraseLast() {
@@ -115,9 +137,13 @@ class _BoardScreenState extends State<BoardScreen> {
     });
   }
 
-  void _askWant(S s) => _speech.speakText(s.boardQuestionWant);
+  void _askWant(S s) {
+    _questionAt = DateTime.now();
+    _speech.speakText(s.boardQuestionWant);
+  }
 
   void _askSee(S s) {
+    _questionAt = DateTime.now();
     _speech.speakText(s.boardAskSee);
     final hasContent = _strip.any((w) => w.kind != WordKind.starter);
     if (!hasContent) {
