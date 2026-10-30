@@ -179,42 +179,26 @@ class S {
 
   // Info screen
   String get infoTitle => _t('О приложении', 'About the App', 'Қолданба туралы');
-  String get infoSubtitle => _t(
-      'Узнай больше о Aila', 'Learn more about Aila', 'Aila туралы көбірек біл');
-  String get infoHowItWorksTitle =>
-      _t('Как работает Aila', 'How Aila works', 'Aila қалай жұмыс істейді');
-  String get infoHowItWorksBody => _t(
-      'Обучение в приложении проходит в формате мини-игр, интерактивных заданий и визуальных карточек. Ребёнок изучает слова, эмоции, предметы, действия и бытовые ситуации через изображения, озвучку, повторение слов и игровые сценарии. Голосовое взаимодействие помогает тренировать речь, произношение и коммуникативные навыки в комфортной и безопасной среде. Искусственный интеллект анализирует прогресс ребёнка и адаптирует задания под его уровень развития.',
-      "Learning in the app happens through mini-games, interactive tasks, and visual cards. The child learns words, emotions, objects, actions, and everyday situations through images, voice, word repetition, and game scenarios. Voice interaction helps develop speech, pronunciation, and communication skills in a comfortable and safe environment. Artificial intelligence analyzes the child's progress and adapts tasks to their developmental level.",
-      'Қолданбадағы оқыту мини-ойындар, интерактивті тапсырмалар және көрнекі карточкалар түрінде өтеді. Бала суреттер, дыбыстау, сөздерді қайталау және ойын сценарийлері арқылы сөздерді, эмоцияларды, заттарды, әрекеттерді және тұрмыстық жағдайларды үйренеді. Дауыстық өзара әрекеттесу сөйлеу тілін, дұрыс айтылымды және қарым-қатынас дағдыларын қолайлы әрі қауіпсіз ортада дамытуға көмектеседі. Жасанды интеллект баланың прогресін талдап, тапсырмаларды оның даму деңгейіне бейімдейді.');
-  String get infoAiStarTitle =>
-      _t('AI-звёздочка Aila', 'Aila the AI star', 'AI-жұлдызша Aila');
-  String get infoAiStarBody => _t(
-      'Главная особенность приложения — живая AI-звёздочка Aila, которая становится другом и помощником ребёнка. Она поддерживает ребёнка, помогает выполнять задания, общается с ним и мотивирует продолжать обучение, превращая развитие навыков в увлекательную игру.',
-      "The app's key feature is Aila — a living AI star that becomes the child's friend and helper. She supports the child, helps complete tasks, talks with them, and motivates them to keep learning, turning skill development into an engaging game.",
-      'Қолданбаның басты ерекшелігі — баланың досы әрі көмекшісіне айналатын жанды AI-жұлдызша Aila. Ол баланы қолдайды, тапсырмаларды орындауға көмектеседі, онымен сөйлеседі және оқуды жалғастыруға ынталандырады, дағдыларды дамытуды қызықты ойынға айналдырады.');
-  String get infoRewardsTitle => _t(
-      'Награды и мотивация', 'Rewards and motivation', 'Марапаттар мен ынталандыру');
-  String get infoRewardsBody => _t(
-      'За выполнение заданий ребёнок получает награды, может кастомизировать Aila и открывать новые игровые элементы, что повышает вовлечённость и интерес к обучению.',
-      "For completing tasks, the child receives rewards, can customize Aila, and unlock new game elements, which increases engagement and interest in learning.",
-      'Тапсырмаларды орындағаны үшін бала марапаттар алады, Aila-ны өзгерте алады және жаңа ойын элементтерін аша алады, бұл оқуға деген қызығушылық пен қатысуды арттырады.');
-  String get infoSpecialistsTitle => _t(
-      'Работа со специалистами', 'Working with specialists', 'Мамандармен жұмыс');
-  String get infoSpecialistsBody => _t(
-      'Платформа также предусматривает возможность дистанционного подключения специалистов для отслеживания прогресса ребёнка и корректировки программы развития.',
-      "The platform also allows specialists to connect remotely to track the child's progress and adjust the development program.",
-      'Платформа сонымен қатар баланың прогресін бақылап, даму бағдарламасын түзету үшін мамандарды қашықтан қосу мүмкіндігін қарастырады.');
-  String get infoDisclaimerTitle => _t('Дисклеймер', 'Disclaimer', 'Ескерту');
-  String get infoDisclaimerBody => _t(
-      'На данный момент проект находится на стадии разработки, поэтому некоторые функции и механики могут изменяться и дорабатываться совместно со специалистами — логопедами, психологами и дефектологами — на основе их рекомендаций и практического опыта.',
-      'The project is currently in development, so some features and mechanics may change and be refined together with specialists — speech therapists, psychologists, and special education teachers — based on their recommendations and practical experience.',
-      'Қазіргі уақытта жоба әзірлену сатысында, сондықтан кейбір функциялар мен механикалар логопедтер, психологтар және дефектологтар сияқты мамандардың ұсыныстары мен тәжірибесі негізінде өзгеруі және жетілдірілуі мүмкін.');
-  String get infoImportantTitle => _t('Важно', 'Important', 'Маңызды');
-  String get infoImportantBody => _t(
-      'Aila не заменяет профессиональную коррекционную помощь и работу со специалистами. Платформа создаётся как дополнительный инструмент поддержки для детей и семей, которые не всегда имеют возможность регулярно посещать коррекционные занятия.',
-      "Aila does not replace professional corrective help and work with specialists. The platform is designed as an additional support tool for children and families who don't always have the opportunity to regularly attend corrective classes.",
-      'Aila мамандардың кәсіби түзету көмегі мен жұмысын алмастырмайды. Платформа түзету сабақтарына үнемі қатыса алмайтын балалар мен отбасылар үшін қосымша қолдау құралы ретінде жасалған.');
+  String get infoSubtitle =>
+      _t('Для родителей и специалистов', 'For parents and specialists', 'Ата-аналар мен мамандарға');
+  String get infoPurposeTitle => _t('Для чего Айла', 'What Aila is for', 'Айла не үшін керек');
+  String get infoPurposeBody => _t(
+      'Айла помогает ребёнку с аутизмом или задержкой речи общаться с помощью карточек с картинками: просить, отвечать, рассказывать о том, что вокруг. В приложении есть доска общения, короткие игры и подсказки для взрослых. Доска усложняется постепенно, вместе с ребёнком.',
+      'Aila helps a child with autism or speech delay communicate using picture cards: to ask, to answer, to talk about the world around them. The app has a communication board, short games and hints for adults. The board grows gradually, together with the child.',
+      'Айла аутизмі немесе сөйлеу тежелісі бар балаға суретті карточкалар арқылы қарым-қатынас жасауға көмектеседі: сұрауға, жауап беруге, айналасы туралы айтуға. Қолданбада қарым-қатынас тақтасы, қысқа ойындар және ересектерге кеңестер бар. Тақта бала өскен сайын біртіндеп күрделенеді.');
+  String get infoNotReplaceTitle => _t(
+      'Не заменяет занятий со специалистом',
+      'Does not replace sessions with a specialist',
+      'Маманмен сабақтарды алмастырмайды');
+  String get infoNotReplaceBody => _t(
+      'Айла не лечит и не ставит диагнозов. Это дополнительный инструмент для занятий дома. Если у вас есть вопросы о развитии ребёнка, обратитесь к логопеду или дефектологу.',
+      'Aila does not treat anything or make diagnoses. It is an additional tool for practice at home. If you have questions about your child\'s development, talk to a speech therapist or a special education teacher.',
+      'Айла емдемейді және диагноз қоймайды. Бұл үйдегі сабақтарға арналған қосымша құрал. Баланың дамуы туралы сұрақтарыңыз болса, логопедке немесе дефектологқа жүгініңіз.');
+  String get infoPrivacyTitle => _t('Конфиденциальность', 'Privacy', 'Құпиялылық');
+  String get infoPrivacyBody => _t(
+      'Все данные хранятся только на этом устройстве и никуда не передаются. Приложению не нужен интернет, в нём нет рекламы и учётных записей. Отчёт попадёт к другим людям, только если вы сами им поделитесь. На iPhone данные могут попасть в резервную копию iCloud, если она у вас включена.',
+      'All data is stored only on this device and is not sent anywhere. The app does not need the internet and has no ads or accounts. The report reaches other people only if you share it yourself. On iPhone, data may be included in your iCloud backup if you have it turned on.',
+      'Барлық деректер тек осы құрылғыда сақталады және ешқайда жіберілмейді. Қолданбаға интернет керек емес, онда жарнама мен тіркелгі жоқ. Есеп басқа адамдарға сіз өзіңіз бөліскенде ғана жетеді. iPhone-да деректер iCloud резервтік көшірмесіне түсуі мүмкін, егер ол қосулы болса.');
 
   // Support screen
   String get supportTitle =>

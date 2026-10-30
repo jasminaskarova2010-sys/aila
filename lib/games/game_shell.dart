@@ -148,21 +148,25 @@ class GameShell extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         content,
-                        const SizedBox(height: 24),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 250),
-                          child: solved
-                              ? _FeedbackBar(
-                                  key: const ValueKey('solved'),
-                                  title: feedbackTitle,
-                                  body: feedbackBody,
-                                  onContinue: onContinue,
-                                )
-                              : const SizedBox(key: ValueKey('unsolved')),
-                        ),
                       ],
                     ),
                   ),
+                ),
+                // Закреплено внизу: на телефоне под карточками «Продолжить»
+                // оказывалось бы за краем экрана.
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: solved
+                      ? Padding(
+                          key: const ValueKey('solved'),
+                          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                          child: _FeedbackBar(
+                            title: feedbackTitle,
+                            body: feedbackBody,
+                            onContinue: onContinue,
+                          ),
+                        )
+                      : const SizedBox(key: ValueKey('unsolved')),
                 ),
               ],
             ),
@@ -179,7 +183,6 @@ class _FeedbackBar extends StatelessWidget {
   final VoidCallback onContinue;
 
   const _FeedbackBar({
-    super.key,
     required this.title,
     required this.body,
     required this.onContinue,

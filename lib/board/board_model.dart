@@ -123,7 +123,9 @@ class BoardModel {
             !kPinnedWordIds.contains(w.id) &&
             _visible(w),
       );
-      return [...social, ...favorites];
+      // Сначала любимые: на телефоне нижние карточки уходят за край экрана, а
+      // «Я хочу яблоко» должно собираться в два нажатия.
+      return [...favorites, ...social];
     }
     return _allWords
         .where((w) => w.category == category && _visible(w))

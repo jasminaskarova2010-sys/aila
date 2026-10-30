@@ -37,7 +37,8 @@ void main() {
           if (call.method == 'setLanguage') {
             ttsLanguages.add(call.arguments as String);
           }
-          if (call.method == 'isLanguageAvailable') {
+          if (call.method == 'isLanguageAvailable' ||
+              call.method == 'setLanguage') {
             return voiceAvailable ? 1 : 0;
           }
           return 1;

@@ -44,8 +44,10 @@ class BoardSpeech {
     try {
       await _tts.awaitSpeakCompletion(true);
       final result = await _tts.isLanguageAvailable(locale);
-      available = result == true || result == 1;
-      await _tts.setLanguage(locale);
+      final set = await _tts.setLanguage(locale);
+      // На Android при самом первом запуске движок мог отвечать «нет голоса»,
+      // хотя говорил. Настоящее отсутствие голоса — это оба ответа «нет».
+      available = result == true || result == 1 || set == 1;
       await _tts.setSpeechRate(0.42);
       await _tts.setPitch(1.0);
     } catch (_) {

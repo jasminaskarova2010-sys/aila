@@ -57,12 +57,7 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
   Future<void> _checkVoice(AppLanguage language) async {
     final available = await _speech.setLanguage(language);
     if (available || !mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 6),
-        content: Text(S.of(context).noVoiceMessage),
-      ),
-    );
+    _showNote(S.of(context).noVoiceMessage, const Duration(seconds: 6));
   }
 
   /// Родитель может сменить язык, фазу или скрыть карточки прямо из игры
@@ -93,6 +88,18 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
     super.dispose();
   }
 
+  /// Сообщение над нижней панелью: оно не должно закрывать «Продолжить».
+  void _showNote(String text, Duration duration) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: duration,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 200),
+        content: Text(text),
+      ),
+    );
+  }
+
   void _handleComplete() {
     final appState = AppStateScope.of(context);
     // Звёзды даются только за первое прохождение задания.
@@ -102,12 +109,7 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
     );
     if (awarded) {
       _earnedStars += kStarsPerGame;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          duration: const Duration(milliseconds: 900),
-          content: Text('+$kStarsPerGame ⭐'),
-        ),
-      );
+      _showNote('+$kStarsPerGame ⭐', const Duration(milliseconds: 900));
     }
     _goNext();
   }
@@ -115,11 +117,9 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
   /// «Попробуем потом»: идём дальше без звёзд, задание остаётся
   /// непройденным, к нему можно вернуться.
   void _handleSkip() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(milliseconds: 1400),
-        content: Text(S.of(context).speakLaterSnackbar),
-      ),
+    _showNote(
+      S.of(context).speakLaterSnackbar,
+      const Duration(milliseconds: 1400),
     );
     _goNext();
   }

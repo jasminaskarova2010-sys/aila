@@ -34,10 +34,17 @@ flutter pub get             # install dependencies after editing pubspec.yaml
 flutter analyze lib/        # static analysis — run after every change, must be clean (infos like deprecated withOpacity are pre-existing and OK)
 flutter run -d macos        # run on macOS desktop (primary dev target used in this repo)
 flutter devices             # list available run targets
-flutter test                # widget/unit tests in test/, по файлу на этап (stage1_test.dart … stage4_test.dart)
+flutter build apk --release # тестовая сборка для Android: build/app/outputs/flutter-apk/app-release.apk
+flutter test                # widget/unit tests in test/, по файлу на этап (stage1_test.dart … stage5_test.dart)
 ```
 
 There is no CI config. `flutter_tts` has no test implementation — tests that open screens using TTS mock the `flutter_tts` MethodChannel.
+
+Android SDK стоит в `~/Library/Android/sdk`, JDK 17 в `~/Library/Java/JavaVirtualMachines`, эмулятор `aila_test`. Файл для Android подписан служебным ключом `~/.android/debug.keystore`: для пилота можно, для Google Play нужны свой ключ и идентификатор вместо `com.example.aila_app`. Аудит — `docs/AUDIT.md`, инструкция для семей — `docs/PILOT_GUIDE.md`, шаги для iPhone — `docs/IOS_TESTFLIGHT.md`.
+
+**Android:** в манифесте нет разрешения INTERNET и стоит `allowBackup="false"`, чтобы данные не уходили в облако (П7), а `TTS_SERVICE` в `<queries>` нужен озвучке на Android 11+. Не убирать.
+
+**Озвучка:** `flutter_tts` на macOS падает, если начать фразу раньше `awaitSpeakCompletion(true)`. Говорить только через `BoardSpeech`: он ждёт настройки. Автотесты этого не поймают, для проверки нужен запуск на настоящем устройстве.
 
 ### Running the app during development
 
@@ -121,4 +128,4 @@ Simple catalog of `WardrobeItem`s purchased with stars via `AppState.purchase`/`
 
 ### Settings / static screens
 
-`settings_screen.dart`, `info_screen.dart`, `support_screen.dart` are mostly static, localized content screens reading from `AppLocaleScope`/`AppStateScope`. Language switching happens in `settings_screen.dart` via `AppLocaleScope.of(context).setLanguage(...)`.
+«О приложении» (`info_screen.dart`) только честные тексты: назначение, «не заменяет занятий со специалистом», авторы картинок, конфиденциальность. Не добавлять обещаний лечения и несуществующих функций. `settings_screen.dart`, `info_screen.dart`, `support_screen.dart` are mostly static, localized content screens reading from `AppLocaleScope`/`AppStateScope`. Language switching happens in `settings_screen.dart` via `AppLocaleScope.of(context).setLanguage(...)`.
