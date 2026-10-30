@@ -1,6 +1,7 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
+import 'board/parent_media.dart';
 import 'l10n/app_language.dart';
 import 'main_screen.dart';
 import 'onboarding_screen.dart';
@@ -13,6 +14,7 @@ void main() async {
 
   // Загружаем сохранённые профили, звёзды и настройки с устройства
   final appState = await AppState.load();
+  await ParentMedia.init();
 
   runApp(MyApp(appState: appState));
 }

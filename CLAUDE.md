@@ -24,7 +24,7 @@ This is not a licensed/official PECS implementation — avoid calling it that in
 | П8 | Работа без интернета | Картинки, озвучка и контент хранятся локально |
 | П9 | Торговая марка | Слово «PECS» не используется в интерфейсе: «Доска общения», «Карточки» |
 | П10 | Без emoji | Ни в учебном контенте, ни на карточках (см. Visual content policy ниже) |
-| П11 | Карточки по лицензии | Основной набор — ARASAAC (CC BY-NC-SA, некоммерческое): без платы/подписок/рекламы, атрибуция обязательна; набор картинок подключается через один слой, чтобы его можно было заменить |
+| П11 | Карточки по лицензии | Основной набор выбрала владелица: Mulberry Symbols (CC BY-SA 4.0), в ТЗ был ARASAAC. Слова, которых нет в Mulberry, — из ARASAAC (CC BY-NC-SA, некоммерческое): без платы/подписок/рекламы, атрибуция обязательна. Набор подключается через один слой `PictogramRepository`, настройка `kPictogramSet` |
 | П12 | Тихий визуальный стиль | Пастельная палитра, скруглённые формы, без мигания |
 
 ## Commands
@@ -85,9 +85,19 @@ The speak game is "Тренировка вместе с родителем": the
 
 Answer feedback in games is intentionally non-alarming: wrong answers get a neutral gray/muted "Попробуй ещё раз" prompt, never a red X or red text — this was also an explicit, deliberate ASD-friendly design decision; don't reintroduce red error states.
 
-### PECS communication board (`lib/pecs_screen.dart`, `lib/pecs/`)
+### Доска общения (`lib/board/`, `lib/parent/board_settings_screen.dart`, `lib/parent/parent_card_form_screen.dart`)
 
-`pecs_data.dart` defines `PecsCardData` (id/category/label/image/spokenText/pictogramBuilder) and the flat `kPecsCards` list covering 6 categories (`kPecsCategoryOrder`/`kPecsCategoryInfo`). Card imagery prefers real illustrations from `assets/pecs_symbols/*.svg` (Mulberry Symbols, CC BY-SA 4.0 — attribution is shown at the bottom of `pecs_screen.dart`; keep it if the symbol set stays in use) via the `_svg()` helper in `pecs_data.dart`, falling back to the same hand-drawn `pictogramBuilder` pattern as games when no symbol fits. Tapping a card speaks its `spokenText` via `flutter_tts` (Russian voice, rate 0.42) and appends it to a composable sentence strip that can be spoken as a whole. When adding new PECS vocabulary, check `assets/EN-symbols/` (the full ~3400-symbol Mulberry source set kept on disk but **not** bundled as a Flutter asset) for a matching file before drawing a new custom pictogram — copy/rename the matched SVG into `assets/pecs_symbols/` with a clear id-based filename and reference it from `pecs_data.dart`, then add the path to `pubspec.yaml` only if you added files outside the already-globbed `assets/pecs_symbols/` directory.
+`BoardScreen` собирается по фазе из профиля (`BoardPhase`: III-A, III-B, IV, IV+, V, VI). Сверху вниз: полоска фразы, стартовые фразы, закреплённая строка (`kPinnedWordIds`, видна на всех фазах и не скрывается), сетка, панель категорий. Звёзды за доску не начисляются.
+
+- `board_words.dart` — ровно 60 слов `kBoardWords`, `ParentCard`. `board_model.dart` — что показать для профиля. Экран не решает это сам, порядок постоянный (П4).
+- `phrase_builder.dart` — сборка фразы: русский через хранимые формы (падеж, род, формы описаний), казахский через шаблоны с глаголом в конце, английский через артикли. Описания всегда перед предметом, размер раньше цвета. Карточки родителя произносятся как записаны. Казахские тексты должен проверить носитель.
+- `board_labels.dart` (в `lib/l10n/`) — подписи 60 слов на трёх языках, в экранах через `S.boardLabel`.
+- `pictogram_repository.dart` — единственное место, которое знает, откуда картинка. `kPictogramSet` переключает весь набор. Сейчас 53 слова из `assets/pecs_symbols/` (Mulberry), 7 из `assets/pictograms/arasaac/` (`i_feel`, `stop`, `bye`, `thanks`, `hurts`, `me`, `cartoon`). Для ARASAAC скачаны все 60 (`dart run tool/fetch_arasaac.dart`, список и ids в `manifest.json`), приложение в сеть не ходит (П8). Атрибуция обоих наборов на экране «О приложении» — не убирать.
+- `flutter_svg` не понимает `<style>` в SVG: такие файлы рисуются чёрными. При копировании нового символа из `assets/EN-symbols/` (~3400 Mulberry, в сборку не входит) перенесите цвета из `<style>` в атрибуты.
+- `board_speech.dart` — озвучка на языке профиля (`flutter_tts`, скорость 0.42). Запись голоса родителя важнее синтеза. Если голоса для языка нет, родитель видит сообщение.
+- `parent_media.dart` — папка с фото и записями карточек родителя. В профиле только имена файлов.
+
+Слово «PECS» в интерфейсе не используется (П9). Папка `assets/pecs_symbols/` и `lib/pecs/pictograms.dart` (последнее нужно играм) сохранили старые имена.
 
 ### Wardrobe / rewards (`lib/wardrobe_screen.dart`, `lib/wardrobe/wardrobe_items.dart`)
 

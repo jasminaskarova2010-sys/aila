@@ -1,7 +1,9 @@
 // lib/l10n/strings.dart
 
 import 'package:flutter/widgets.dart';
+import '../board/board_words.dart';
 import 'app_language.dart';
+import 'board_labels.dart';
 
 class S {
   final AppLanguage lang;
@@ -96,7 +98,8 @@ class S {
       '$done / $total активностей', '$done / $total activities', '$done / $total тапсырма');
   String get startJourneyButton => _t(
       'НАЧАТЬ ПУТЕШЕСТВИЕ', 'START MY JOURNEY', 'САЯХАТТЫ БАСТАУ');
-  String get pecsCards => _t('Карточки PECS', 'PECS Cards', 'PECS карточкалары');
+  String get boardTitle =>
+      _t('Доска общения', 'Communication board', 'Қарым-қатынас тақтасы');
   String get pecsSubtitle => _t('Общение с помощью картинок',
       'Communicate with pictures', 'Суреттер арқылы қарым-қатынас');
   String get profileSnackbar => _t('Профиль', 'Profile', 'Профиль');
@@ -226,4 +229,157 @@ class S {
       'Сұрақтарыңыз, тілектеріңіз немесе мәселелеріңіз болса — бізге жазыңыз немесе қоңырау шалыңыз. Біз міндетті түрде көмектесеміз!');
   String get numberCopied => _t('Номер скопирован', 'Number copied', 'Нөмір көшірілді');
   String get emailCopied => _t('Email скопирован', 'Email copied', 'Email көшірілді');
+
+  // Доска общения
+  String boardLabel(BoardWord word) =>
+      word.customLabel ?? boardWordLabel(word.id, lang);
+  String boardCategoryName(BoardCategory category) {
+    switch (category) {
+      case BoardCategory.home:
+        return _t('Домой', 'Home', 'Басты');
+      case BoardCategory.food:
+        return _t('Еда', 'Food', 'Тамақ');
+      case BoardCategory.drinks:
+        return _t('Напитки', 'Drinks', 'Сусындар');
+      case BoardCategory.toys:
+        return _t('Игрушки', 'Toys', 'Ойыншықтар');
+      case BoardCategory.actions:
+        return _t('Действия', 'Actions', 'Әрекеттер');
+      case BoardCategory.people:
+        return _t('Люди', 'People', 'Адамдар');
+      case BoardCategory.places:
+        return _t('Места', 'Places', 'Орындар');
+      case BoardCategory.feelings:
+        return _t('Чувства', 'Feelings', 'Сезімдер');
+      case BoardCategory.descriptions:
+        return _t('Описания', 'Descriptions', 'Сипаттамалар');
+      case BoardCategory.starters:
+        return _t('Начало фразы', 'Phrase starters', 'Сөйлем басы');
+    }
+  }
+  String get boardSay => _t('Сказать', 'Say', 'Айту');
+  String get boardErase => _t('Стереть', 'Erase', 'Өшіру');
+  String get boardAsk => _t('Задать вопрос', 'Ask a question', 'Сұрақ қою');
+  String get boardAskSee =>
+      _t('Что ты видишь?', 'What do you see?', 'Не көріп тұрсың?');
+  String get boardQuestionWant =>
+      _t('Что ты хочешь?', 'What do you want?', 'Не қалайсың?');
+  String hintRequest(String what) => _t(
+      'Ребёнок просит: $what. Дайте и назовите вслух',
+      'Your child is asking for: $what. Give it and say the word aloud',
+      'Бала сұрап тұр: $what. Беріңіз де, дауыстап атаңыз');
+  String hintComment(String what) => _t(
+      'Ребёнок говорит: $what. Ответьте ему',
+      'Your child says: $what. Answer them',
+      'Бала айтып тұр: $what. Оған жауап беріңіз');
+  String get noVoiceMessage => _t(
+      'На этом устройстве нет голоса для выбранного языка, поэтому синтез речи может молчать или говорить с акцентом. Запишите свой голос для карточек: Настройки → Доска общения → Мои карточки.',
+      'This device has no voice for the selected language, so speech may be silent or accented. Record your own voice for cards: Settings → Communication board → My cards.',
+      'Бұл құрылғыда таңдалған тілге дауыс жоқ, сондықтан сөйлеу естілмеуі немесе акцентпен болуы мүмкін. Карточкаларға өз дауысыңызды жазыңыз: Баптаулар → Қарым-қатынас тақтасы → Менің карточкаларым.');
+
+  // Настройки доски
+  String get boardSettingsSubtitle => _t(
+      'Что ребёнок видит на доске', 'What your child sees on the board', 'Бала тақтада не көреді');
+  String get boardPhaseSection => _t('Фаза', 'Phase', 'Кезең');
+  String boardPhaseName(BoardPhase phase) {
+    switch (phase) {
+      case BoardPhase.iiiA:
+        return _t('III-A: две карточки', 'III-A: two cards', 'III-A: екі карточка');
+      case BoardPhase.iiiB:
+        return _t('III-B: больше карточек', 'III-B: more cards', 'III-B: көбірек карточка');
+      case BoardPhase.iv:
+        return _t('IV: фраза «Я хочу»', 'IV: "I want" phrase', 'IV: «Мен қалаймын» сөйлемі');
+      case BoardPhase.ivPlus:
+        return _t('IV+: описания', 'IV+: descriptions', 'IV+: сипаттамалар');
+      case BoardPhase.v:
+        return _t('V: ответ на вопрос', 'V: answering a question', 'V: сұраққа жауап');
+      case BoardPhase.vi:
+        return _t('VI: рассказ о том, что вокруг', 'VI: talking about the world', 'VI: айналаны әңгімелеу');
+    }
+  }
+  String boardPhaseHint(BoardPhase phase) {
+    switch (phase) {
+      case BoardPhase.iiiA:
+        return _t('Любимый предмет и нейтральный. Нажатие сразу озвучивает слово.',
+            'A favourite item and a neutral one. A tap speaks the word right away.',
+            'Сүйікті зат және бейтарап зат. Басқанда сөз бірден айтылады.');
+      case BoardPhase.iiiB:
+        return _t('От 3 до 20 карточек, категории открываются переключателем.',
+            'From 3 to 20 cards, categories are opened with a switch.',
+            '3-тен 20-ға дейін карточка, санаттар ауыстырғышпен ашылады.');
+      case BoardPhase.iv:
+        return _t('Полоска фразы, «Я хочу» уже стоит первой.',
+            'A phrase strip with "I want" already in place.',
+            'Сөйлем жолағы, «Мен қалаймын» бірінші тұрады.');
+      case BoardPhase.ivPlus:
+        return _t('Открываются описания: «Я хочу большой красный мяч».',
+            'Descriptions open: "I want a big red ball".',
+            'Сипаттамалар ашылады: «Мен үлкен қызыл доп қалаймын».');
+      case BoardPhase.v:
+        return _t('Появляется кнопка «Задать вопрос» для взрослого.',
+            'An "Ask a question" button appears for the adult.',
+            'Ересекке «Сұрақ қою» түймесі шығады.');
+      case BoardPhase.vi:
+        return _t('Открываются «Я вижу», «Я слышу», «Это» и вопрос «Что ты видишь?».',
+            'Opens "I see", "I hear", "This is" and the question "What do you see?".',
+            '«Мен көремін», «Мен естимін», «Бұл» және «Не көріп тұрсың?» сұрағы ашылады.');
+    }
+  }
+  String get adultHintLabel =>
+      _t('Подсказка взрослому', 'Hint for the adult', 'Ересекке кеңес');
+  String get adultHintBody => _t('Плашка на 2–3 секунды после фразы',
+      'A banner for 2–3 seconds after a phrase', 'Сөйлемнен кейін 2–3 секундтық жазу');
+  String boardCardCountLabel(int count) =>
+      _t('Карточек на экране: $count', 'Cards on screen: $count', 'Экрандағы карточка: $count');
+  String get boardCategoriesSwitch =>
+      _t('Открыть категории', 'Open categories', 'Санаттарды ашу');
+  String get favoritesSection =>
+      _t('Любимые предметы', 'Favourite items', 'Сүйікті заттар');
+  String get favoritesHint => _t(
+      'Видны на главной странице доски, первый идёт в фазу III-A.',
+      'Shown on the board home page; the first one is used in phase III-A.',
+      'Тақтаның басты бетінде көрінеді, біріншісі III-A кезеңінде қолданылады.');
+  String get myCardsSection => _t('Мои карточки', 'My cards', 'Менің карточкаларым');
+  String get myCardsEmpty => _t(
+      'Добавьте фото вещей и людей из жизни ребёнка.',
+      "Add photos of things and people from your child's life.",
+      'Бала өміріндегі заттар мен адамдардың суретін қосыңыз.');
+  String get addCard => _t('Добавить карточку', 'Add a card', 'Карточка қосу');
+  String get showHideSection =>
+      _t('Показать или скрыть', 'Show or hide', 'Көрсету немесе жасыру');
+  String get showHideHint => _t(
+      'Карточки не удаляются: ребёнок привыкает к их расположению.',
+      'Cards are never deleted: children get used to where they are.',
+      'Карточкалар өшірілмейді: бала олардың орнына үйренеді.');
+  String get showCategory =>
+      _t('Показывать категорию', 'Show this category', 'Санатты көрсету');
+
+  // Новая карточка
+  String get cardPhoto => _t('Фото', 'Photo', 'Сурет');
+  String get cardFromCamera => _t('Камера', 'Camera', 'Камера');
+  String get cardFromGallery => _t('Галерея', 'Gallery', 'Галерея');
+  String get cardLabel => _t('Подпись', 'Label', 'Жазу');
+  String get cardLabelHint => _t('Например: Мишка', 'For example: Teddy', 'Мысалы: Аюшық');
+  String get cardCategory => _t('Категория', 'Category', 'Санат');
+  String get cardVoice =>
+      _t('Ваш голос (необязательно)', 'Your voice (optional)', 'Сіздің дауысыңыз (міндетті емес)');
+  String get cardVoiceHint => _t(
+      'Запись родного голоса лучше синтеза речи.',
+      'A familiar voice is better than synthetic speech.',
+      'Таныс дауыс синтезден жақсы.');
+  String get cardRecord => _t('Записать', 'Record', 'Жазу');
+  String get cardStopRecord => _t('Остановить', 'Stop', 'Тоқтату');
+  String get cardRecordAgain => _t('Записать заново', 'Record again', 'Қайта жазу');
+  String get cardPlay => _t('Послушать', 'Listen', 'Тыңдау');
+  String get cardNoMic => _t(
+      'Нет доступа к микрофону. Разрешите его в настройках устройства.',
+      'No microphone access. Allow it in the device settings.',
+      'Микрофонға рұқсат жоқ. Құрылғы баптауларында рұқсат беріңіз.');
+
+  // О приложении
+  String get infoPictogramsTitle => _t('Пиктограммы', 'Pictograms', 'Пиктограммалар');
+  String get infoPictogramsBody => _t(
+      'Mulberry Symbols: © Steve Lee, лицензия CC BY-SA 4.0.\n\nАвтор пиктограмм: Sergio Palao. Источник: ARASAAC (https://arasaac.org). Лицензия: CC BY-NC-SA. Собственность: Правительство Арагона.',
+      'Mulberry Symbols: © Steve Lee, CC BY-SA 4.0 license.\n\nPictograms author: Sergio Palao. Source: ARASAAC (https://arasaac.org). License: CC BY-NC-SA. Owner: Government of Aragon.',
+      'Mulberry Symbols: © Steve Lee, CC BY-SA 4.0 лицензиясы.\n\nПиктограммалар авторы: Sergio Palao. Дереккөз: ARASAAC (https://arasaac.org). Лицензия: CC BY-NC-SA. Меншік иесі: Арагон үкіметі.');
 }

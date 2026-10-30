@@ -28,5 +28,7 @@
     <string>MainMenu</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Чтобы записать ваш голос для карточек доски. Запись остаётся на устройстве.</string>
 </dict>
 </plist>

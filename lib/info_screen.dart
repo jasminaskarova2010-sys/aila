@@ -139,6 +139,11 @@ class InfoScreen extends StatelessWidget {
                         title: s.infoImportantTitle,
                         body: s.infoImportantBody,
                       ),
+                      const SizedBox(height: 18),
+                      _InfoSection(
+                        title: s.infoPictogramsTitle,
+                        body: s.infoPictogramsBody,
+                      ),
                     ],
                   ),
                 ),

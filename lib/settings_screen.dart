@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'info_screen.dart';
 import 'l10n/app_language.dart';
 import 'l10n/strings.dart';
+import 'parent/board_settings_screen.dart';
 import 'parent/pin_screens.dart';
 import 'parent/profile_form_screen.dart';
 import 'state/app_state.dart';
@@ -172,6 +173,12 @@ class SettingsScreen extends StatelessWidget {
                     icon: Icons.person_add_alt,
                     label: s.addProfile,
                     onTap: () => _push(context, const ProfileFormScreen()),
+                  ),
+                  const _RowDivider(),
+                  _NavigationRow(
+                    icon: Icons.grid_view_rounded,
+                    label: s.boardTitle,
+                    onTap: () => _push(context, const BoardSettingsScreen()),
                   ),
                   const _RowDivider(),
                   _NavigationRow(
@@ -516,17 +523,16 @@ class _NavigationRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final Color color;
 
   const _NavigationRow({
     required this.icon,
     required this.label,
     required this.onTap,
-    this.color = const Color(0xFF331A47),
   });
 
   @override
   Widget build(BuildContext context) {
+    const color = Color(0xFF331A47);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -540,7 +546,7 @@ class _NavigationRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: color,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,

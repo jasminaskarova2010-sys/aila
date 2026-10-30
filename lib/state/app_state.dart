@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../board/board_words.dart';
 import '../l10n/app_language.dart';
 
 /// Профиль одного ребёнка. У каждого ребёнка свои звёзды, наряды и
@@ -19,6 +20,16 @@ class ChildProfile {
   String equippedOutfitId;
   final Set<int> completedGameIndices;
 
+  // Доска общения
+  BoardPhase boardPhase;
+  bool adultHintEnabled;
+  int boardCardCount;
+  bool boardCategoriesEnabled;
+  final List<String> favoriteWordIds;
+  final Set<String> hiddenWordIds;
+  final Set<BoardCategory> hiddenCategories;
+  final List<ParentCard> parentCards;
+
   ChildProfile({
     required this.id,
     this.name = '',
@@ -28,8 +39,21 @@ class ChildProfile {
     Set<String>? ownedOutfitIds,
     this.equippedOutfitId = 'default',
     Set<int>? completedGameIndices,
+    // Пока нет опроса этапа 3, новый профиль начинает с фазы IV.
+    this.boardPhase = BoardPhase.iv,
+    this.adultHintEnabled = true,
+    this.boardCardCount = 6,
+    this.boardCategoriesEnabled = false,
+    List<String>? favoriteWordIds,
+    Set<String>? hiddenWordIds,
+    Set<BoardCategory>? hiddenCategories,
+    List<ParentCard>? parentCards,
   }) : ownedOutfitIds = ownedOutfitIds ?? {'default'},
-       completedGameIndices = completedGameIndices ?? {};
+       completedGameIndices = completedGameIndices ?? {},
+       favoriteWordIds = favoriteWordIds ?? List.of(kDefaultFavoriteIds),
+       hiddenWordIds = hiddenWordIds ?? {},
+       hiddenCategories = hiddenCategories ?? {},
+       parentCards = parentCards ?? [];
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -40,6 +64,14 @@ class ChildProfile {
     'ownedOutfitIds': ownedOutfitIds.toList(),
     'equippedOutfitId': equippedOutfitId,
     'completedGameIndices': completedGameIndices.toList(),
+    'boardPhase': boardPhase.name,
+    'adultHintEnabled': adultHintEnabled,
+    'boardCardCount': boardCardCount,
+    'boardCategoriesEnabled': boardCategoriesEnabled,
+    'favoriteWordIds': favoriteWordIds,
+    'hiddenWordIds': hiddenWordIds.toList(),
+    'hiddenCategories': hiddenCategories.map((c) => c.name).toList(),
+    'parentCards': parentCards.map((c) => c.toJson()).toList(),
   };
 
   factory ChildProfile.fromJson(Map<String, dynamic> json) => ChildProfile(
@@ -59,6 +91,25 @@ class ChildProfile {
     completedGameIndices: (json['completedGameIndices'] as List? ?? [])
         .cast<int>()
         .toSet(),
+    boardPhase: BoardPhase.values.firstWhere(
+      (p) => p.name == json['boardPhase'],
+      orElse: () => BoardPhase.iv,
+    ),
+    adultHintEnabled: json['adultHintEnabled'] as bool? ?? true,
+    boardCardCount: json['boardCardCount'] as int? ?? 6,
+    boardCategoriesEnabled: json['boardCategoriesEnabled'] as bool? ?? false,
+    favoriteWordIds: (json['favoriteWordIds'] as List?)?.cast<String>().toList(),
+    hiddenWordIds: (json['hiddenWordIds'] as List? ?? [])
+        .cast<String>()
+        .toSet(),
+    hiddenCategories: {
+      for (final name in (json['hiddenCategories'] as List? ?? []).cast<String>())
+        for (final category in BoardCategory.values)
+          if (category.name == name) category,
+    },
+    parentCards: (json['parentCards'] as List? ?? [])
+        .map((c) => ParentCard.fromJson(c as Map<String, dynamic>))
+        .toList(),
   );
 }
 
@@ -260,6 +311,46 @@ class AppState extends ChangeNotifier {
     profile.equippedOutfitId = id;
     _changed();
   }
+
+  // Доска общения (текущего профиля)
+
+  void _updateBoard(void Function(ChildProfile profile) update) {
+    final profile = activeProfile;
+    if (profile == null) return;
+    update(profile);
+    _changed();
+  }
+
+  void setBoardPhase(BoardPhase phase) =>
+      _updateBoard((p) => p.boardPhase = phase);
+
+  void setAdultHintEnabled(bool value) =>
+      _updateBoard((p) => p.adultHintEnabled = value);
+
+  void setBoardCardCount(int count) =>
+      _updateBoard((p) => p.boardCardCount = count);
+
+  void setBoardCategoriesEnabled(bool value) =>
+      _updateBoard((p) => p.boardCategoriesEnabled = value);
+
+  void setFavorite(String wordId, bool favorite) => _updateBoard((p) {
+    p.favoriteWordIds.remove(wordId);
+    if (favorite) p.favoriteWordIds.add(wordId);
+  });
+
+  void setWordHidden(String wordId, bool hidden) => _updateBoard((p) {
+    hidden ? p.hiddenWordIds.add(wordId) : p.hiddenWordIds.remove(wordId);
+  });
+
+  void setCategoryHidden(BoardCategory category, bool hidden) =>
+      _updateBoard((p) {
+        hidden
+            ? p.hiddenCategories.add(category)
+            : p.hiddenCategories.remove(category);
+      });
+
+  void addParentCard(ParentCard card) =>
+      _updateBoard((p) => p.parentCards.add(card));
 }
 
 class AppStateScope extends InheritedNotifier<AppState> {

@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import '../l10n/strings.dart';
 import '../main_screen.dart';
 import '../state/app_state.dart';
-import '../widgets/primary_button.dart';
 
 const int kPinLength = 4;
 

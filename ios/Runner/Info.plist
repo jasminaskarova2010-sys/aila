@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Чтобы записать ваш голос для карточек доски. Запись остаётся на устройстве.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Чтобы сфотографировать предмет для карточки доски. Фото остаётся на устройстве.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Чтобы выбрать фото для карточки доски. Фото остаётся на устройстве.</string>
 </dict>
 </plist>

@@ -5,7 +5,7 @@ import '../games/game_models.dart';
 import '../games/games_flow_screen.dart';
 import '../games/journey_titles_sheet.dart';
 import '../l10n/strings.dart';
-import '../pecs_screen.dart';
+import '../board/board_screen.dart';
 import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
 import '../state/app_state.dart';
@@ -263,13 +263,13 @@ class HomeTab extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           _PecsCard(
-                            title: s.pecsCards,
+                            title: s.boardTitle,
                             subtitle: s.pecsSubtitle,
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const PecsScreen(),
+                                  builder: (context) => const BoardScreen(),
                                 ),
                               );
                             },
