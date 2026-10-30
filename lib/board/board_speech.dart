@@ -27,40 +27,61 @@ class BoardSpeech {
   /// Каждое новое озвучивание отменяет предыдущее.
   int _generation = 0;
 
+  /// Настройка озвучки, которая ещё идёт. Говорить можно только после неё:
+  /// если начать фразу раньше awaitSpeakCompletion, flutter_tts на macOS падает,
+  /// когда фраза закончится.
+  Future<bool>? _ready;
+
   /// Настраивает язык. Возвращает false, если голоса для него на устройстве нет.
-  Future<bool> setLanguage(AppLanguage language) async {
+  Future<bool> setLanguage(AppLanguage language) {
     _language = language;
+    return _ready = _configure(language);
+  }
+
+  Future<bool> _configure(AppLanguage language) async {
     final locale = _ttsLocales[language]!;
     var available = true;
     try {
+      await _tts.awaitSpeakCompletion(true);
       final result = await _tts.isLanguageAvailable(locale);
       available = result == true || result == 1;
       await _tts.setLanguage(locale);
       await _tts.setSpeechRate(0.42);
       await _tts.setPitch(1.0);
-      await _tts.awaitSpeakCompletion(true);
     } catch (_) {
       available = false;
     }
     return available;
   }
 
+  /// Останавливает прошлую фразу и ждёт настройки. Возвращает номер этого
+  /// озвучивания: если за время ожидания началось новое, старое уже не звучит.
+  Future<int> _begin() async {
+    final generation = ++_generation;
+    await _tts.stop();
+    await _player?.stop();
+    await (_ready ??= _configure(_language));
+    return generation;
+  }
+
   Future<void> speakText(String text) async {
-    await _stop();
-    await _tts.speak(text);
+    final generation = await _begin();
+    if (generation == _generation) await _tts.speak(text);
   }
 
   Future<void> speakWord(BoardWord word) async {
-    await _stop();
-    if (await _playRecording(word, _generation)) return;
+    final generation = await _begin();
+    if (generation != _generation) return;
+    if (await _playRecording(word, generation)) return;
+    if (generation != _generation) return;
     await _tts.speak(word.customLabel ?? boardWordLabel(word.id, _language));
   }
 
   /// Фраза целиком. Карточки с записью голоса звучат своей записью, остальное
   /// — синтезом по кускам между ними.
   Future<void> speakPhrase(List<BoardWord> parts) async {
-    await _stop();
-    final generation = _generation;
+    final generation = await _begin();
+    if (generation != _generation) return;
     var run = <BoardWord>[];
     Future<void> flush() async {
       if (run.isEmpty) return;
@@ -90,12 +111,6 @@ class BoardSpeech {
     await player.play(DeviceFileSource(file.path));
     await done.timeout(const Duration(seconds: 30), onTimeout: () {});
     return generation == _generation;
-  }
-
-  Future<void> _stop() async {
-    _generation++;
-    await _tts.stop();
-    await _player?.stop();
   }
 
   void dispose() {

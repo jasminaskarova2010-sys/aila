@@ -305,6 +305,31 @@ void main() {
     expect(find.text('Найди картинку'), findsOneWidget);
   });
 
+  testWidgets('игра говорит только после настройки озвучки', (tester) async {
+    // Настоящая настройка занимает время. Если заговорить раньше
+    // awaitSpeakCompletion, flutter_tts на macOS падает, когда фраза закончится.
+    final calls = <String>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(const MethodChannel('flutter_tts'), (
+          call,
+        ) async {
+          calls.add(call.method);
+          if (call.method == 'isLanguageAvailable') {
+            await Future<void>.delayed(const Duration(milliseconds: 200));
+          }
+          return 1;
+        });
+    final state = await newState();
+    await openFlow(tester, state, 0);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(calls, contains('speak'));
+    expect(
+      calls.indexOf('awaitSpeakCompletion'),
+      lessThan(calls.indexOf('speak')),
+    );
+  });
+
   testWidgets('нет голоса: честное сообщение родителю', (tester) async {
     voiceAvailable = false;
     final state = await newState(language: AppLanguage.kk);
