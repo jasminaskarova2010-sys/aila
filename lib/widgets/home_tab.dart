@@ -24,8 +24,9 @@ class HomeTab extends StatelessWidget {
     final appState = AppStateScope.of(context);
     final userName = _getUserDisplayName(s, appState);
     final steps = gameStepsFor(context);
-    final completedCount =
-        steps.where((step) => appState.isGameCompleted(step.id)).length;
+    final completedCount = steps
+        .where((step) => appState.isGameCompleted(step.id))
+        .length;
     final totalGames = steps.length;
 
     return Scaffold(
@@ -37,20 +38,14 @@ class HomeTab extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    Color(0xFFFDF3E4),
-                    Color(0xFFFCE9D2),
-                  ],
+                  colors: [Colors.white, Color(0xFFFDF3E4), Color(0xFFFCE9D2)],
                   stops: [0.0, 0.55, 1.0],
                 ),
               ),
             ),
           ),
           Positioned.fill(
-            child: CustomPaint(
-              painter: HomeConstellationPainter(),
-            ),
+            child: CustomPaint(painter: HomeConstellationPainter()),
           ),
           const Positioned(
             top: 120,
@@ -69,122 +64,86 @@ class HomeTab extends StatelessWidget {
             ),
           ),
           SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints:
-                        BoxConstraints(minHeight: constraints.maxHeight),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                            children: [
-                              _CircleIconButton(
-                                icon: Icons.person,
-                                onTap: () {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                    SnackBar(
-                                      content: Text(s.profileSnackbar),
-                                    ),
-                                  );
-                                },
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  openParentArea(
-                                    context,
-                                    (context) => const SettingsScreen(),
-                                  );
-                                },
-                                child: Column(
-                                  children: [
-                                    const _CircleIconButton(
-                                      icon: Icons.settings,
-                                      onTap: null,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      s.settingsTitle,
-                                      style: TextStyle(
-                                        color: const Color(0xFF331A47)
-                                            .withOpacity(0.7),
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            s.greeting(userName),
-                            style: const TextStyle(
-                              color: Color(0xFF331A47),
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
+            child: Column(
+              children: [
+                // Шапка не прокручивается: «Настройки» всегда под рукой.
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _CircleIconButton(
+                        icon: Icons.person,
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(s.profileSnackbar)),
+                          );
+                        },
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          openParentArea(
+                            context,
+                            (context) => const SettingsScreen(),
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            const _CircleIconButton(
+                              icon: Icons.settings,
+                              onTap: null,
                             ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            s.readyForToday,
-                            style: TextStyle(
-                              color: const Color(0xFF331A47).withOpacity(0.55),
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(24),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      const Color(0xFF331A47).withOpacity(0.08),
-                                  offset: const Offset(0, 6),
-                                  blurRadius: 14,
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              s.startJourneyCard,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Color(0xFF331A47),
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                height: 1.3,
+                            const SizedBox(height: 4),
+                            Text(
+                              s.settingsTitle,
+                              style: TextStyle(
+                                color: const Color(0xFF331A47).withOpacity(0.7),
+                                fontSize: 12,
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          s.greeting(userName),
+                          style: const TextStyle(
+                            color: Color(0xFF331A47),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 8),
-                          Image.asset(
-                            'assets/star_mascot.png',
-                            width: 220,
-                            fit: BoxFit.contain,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          s.readyForToday,
+                          style: TextStyle(
+                            color: const Color(0xFF331A47).withOpacity(0.55),
+                            fontSize: 16,
                           ),
-                          const SizedBox(height: 16),
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(24),
-                              onTap: () => showJourneyTitlesSheet(context),
+                        ),
+                        const SizedBox(height: 16),
+                        // Звёздочка поменьше и рядом с облачком: на телефоне доска
+                        // и игры должны помещаться на первом экране без прокрутки.
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/star_mascot.png',
+                              width: 96,
+                              fit: BoxFit.contain,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
                               child: Container(
-                                width: double.infinity,
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
+                                  horizontal: 24,
                                   vertical: 16,
                                 ),
                                 decoration: BoxDecoration(
@@ -192,97 +151,138 @@ class HomeTab extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(24),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFF331A47)
-                                          .withOpacity(0.08),
+                                      color: const Color(
+                                        0xFF331A47,
+                                      ).withOpacity(0.08),
                                       offset: const Offset(0, 6),
                                       blurRadius: 14,
                                     ),
                                   ],
                                 ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 44,
-                                      height: 44,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFDF0D5),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.star,
-                                        color: Color(0xFFE0A93E),
-                                        size: 22,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            s.journeyOfDay,
-                                            style: const TextStyle(
-                                              color: Color(0xFF331A47),
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            s.activitiesCount(
-                                                completedCount, totalGames),
-                                            style: TextStyle(
-                                              color: const Color(0xFF331A47)
-                                                  .withOpacity(0.5),
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    _ProgressBadge(
-                                      completed: completedCount,
-                                      total: totalGames,
-                                    ),
-                                  ],
+                                child: Text(
+                                  s.startJourneyCard,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Color(0xFF331A47),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.3,
+                                  ),
                                 ),
                               ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _PecsCard(
+                          title: s.boardTitle,
+                          subtitle: s.pecsSubtitle,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const BoardScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _DarkActionButton(
+                          text: s.startJourneyButton,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const GamesFlowScreen(startIndex: 0),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(24),
+                            onTap: () => showJourneyTitlesSheet(context),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF331A47,
+                                    ).withOpacity(0.08),
+                                    offset: const Offset(0, 6),
+                                    blurRadius: 14,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFDF0D5),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.star,
+                                      color: Color(0xFFE0A93E),
+                                      size: 22,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          s.journeyOfDay,
+                                          style: const TextStyle(
+                                            color: Color(0xFF331A47),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          s.activitiesCount(
+                                            completedCount,
+                                            totalGames,
+                                          ),
+                                          style: TextStyle(
+                                            color: const Color(
+                                              0xFF331A47,
+                                            ).withOpacity(0.5),
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  _ProgressBadge(
+                                    completed: completedCount,
+                                    total: totalGames,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          _DarkActionButton(
-                            text: s.startJourneyButton,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const GamesFlowScreen(startIndex: 0),
-                                ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _PecsCard(
-                            title: s.boardTitle,
-                            subtitle: s.pecsSubtitle,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const BoardScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
         ],
@@ -295,10 +295,7 @@ class _CircleIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
 
-  const _CircleIconButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _CircleIconButton({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -352,8 +349,7 @@ class _ProgressBadge extends StatelessWidget {
               done ? const Color(0xFF6EA34F) : const Color(0xFFE0A93E),
             ),
           ),
-          if (done)
-            const Icon(Icons.check, color: Color(0xFF6EA34F), size: 16),
+          if (done) const Icon(Icons.check, color: Color(0xFF6EA34F), size: 16),
         ],
       ),
     );
@@ -364,10 +360,7 @@ class _DarkActionButton extends StatelessWidget {
   final String text;
   final VoidCallback onTap;
 
-  const _DarkActionButton({
-    required this.text,
-    required this.onTap,
-  });
+  const _DarkActionButton({required this.text, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -502,46 +495,46 @@ class HomeConstellationPainter extends CustomPainter {
   final List<Offset> _sparkles;
 
   HomeConstellationPainter()
-      : _clusters = [
-          [
-            const Offset(0.05, 0.02),
-            const Offset(0.13, 0.005),
-            const Offset(0.16, 0.05),
-            const Offset(0.07, 0.07),
-          ],
-          [
-            const Offset(0.84, 0.02),
-            const Offset(0.93, 0.05),
-            const Offset(0.87, 0.09),
-          ],
-          [
-            const Offset(0.9, 0.24),
-            const Offset(0.97, 0.28),
-            const Offset(0.92, 0.32),
-          ],
-          [
-            const Offset(0.03, 0.6),
-            const Offset(0.1, 0.57),
-            const Offset(0.13, 0.63),
-            const Offset(0.06, 0.66),
-          ],
-          [
-            const Offset(0.82, 0.68),
-            const Offset(0.92, 0.65),
-            const Offset(0.95, 0.72),
-            const Offset(0.86, 0.75),
-          ],
+    : _clusters = [
+        [
+          const Offset(0.05, 0.02),
+          const Offset(0.13, 0.005),
+          const Offset(0.16, 0.05),
+          const Offset(0.07, 0.07),
         ],
-        _sparkles = [
-          const Offset(0.2, 0.01),
-          const Offset(0.72, 0.04),
-          const Offset(0.02, 0.18),
-          const Offset(0.94, 0.22),
-          const Offset(0.06, 0.5),
-          const Offset(0.9, 0.45),
-          const Offset(0.2, 0.72),
-          const Offset(0.78, 0.7),
-        ];
+        [
+          const Offset(0.84, 0.02),
+          const Offset(0.93, 0.05),
+          const Offset(0.87, 0.09),
+        ],
+        [
+          const Offset(0.9, 0.24),
+          const Offset(0.97, 0.28),
+          const Offset(0.92, 0.32),
+        ],
+        [
+          const Offset(0.03, 0.6),
+          const Offset(0.1, 0.57),
+          const Offset(0.13, 0.63),
+          const Offset(0.06, 0.66),
+        ],
+        [
+          const Offset(0.82, 0.68),
+          const Offset(0.92, 0.65),
+          const Offset(0.95, 0.72),
+          const Offset(0.86, 0.75),
+        ],
+      ],
+      _sparkles = [
+        const Offset(0.2, 0.01),
+        const Offset(0.72, 0.04),
+        const Offset(0.02, 0.18),
+        const Offset(0.94, 0.22),
+        const Offset(0.06, 0.5),
+        const Offset(0.9, 0.45),
+        const Offset(0.2, 0.72),
+        const Offset(0.78, 0.7),
+      ];
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -589,13 +582,29 @@ class HomeConstellationPainter extends CustomPainter {
 
     path.moveTo(center.dx, center.dy - r);
     path.quadraticBezierTo(
-        center.dx + rInner, center.dy - rInner, center.dx + r, center.dy);
+      center.dx + rInner,
+      center.dy - rInner,
+      center.dx + r,
+      center.dy,
+    );
     path.quadraticBezierTo(
-        center.dx + rInner, center.dy + rInner, center.dx, center.dy + r);
+      center.dx + rInner,
+      center.dy + rInner,
+      center.dx,
+      center.dy + r,
+    );
     path.quadraticBezierTo(
-        center.dx - rInner, center.dy + rInner, center.dx - r, center.dy);
+      center.dx - rInner,
+      center.dy + rInner,
+      center.dx - r,
+      center.dy,
+    );
     path.quadraticBezierTo(
-        center.dx - rInner, center.dy - rInner, center.dx, center.dy - r);
+      center.dx - rInner,
+      center.dy - rInner,
+      center.dx,
+      center.dy - r,
+    );
     path.close();
 
     canvas.drawPath(path, paint);
@@ -603,4 +612,4 @@ class HomeConstellationPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-} 
+}

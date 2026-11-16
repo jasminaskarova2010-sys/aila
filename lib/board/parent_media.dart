@@ -25,6 +25,18 @@ class ParentMedia {
 
   /// В профиле лежит только имя файла: полный путь на iOS меняется от запуска
   /// к запуску.
+  /// Удаляет файлы карточек (например, вместе с профилем ребёнка).
+  static void deleteFiles(Iterable<String?> fileNames) {
+    for (final name in fileNames) {
+      final target = file(name);
+      try {
+        if (target != null && target.existsSync()) target.deleteSync();
+      } catch (_) {
+        // Файл занят или уже удалён: профиль всё равно удалён.
+      }
+    }
+  }
+
   static File? file(String? fileName) {
     if (_directory == null || fileName == null) return null;
     return File('${_directory!.path}/$fileName');

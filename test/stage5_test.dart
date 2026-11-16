@@ -3,8 +3,10 @@
 import 'dart:io';
 
 import 'package:aila_app/info_screen.dart';
+import 'package:aila_app/journal/journal.dart';
 import 'package:aila_app/l10n/app_language.dart';
 import 'package:aila_app/main.dart';
+import 'package:aila_app/settings_screen.dart';
 import 'package:aila_app/state/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -76,4 +78,74 @@ void main() {
     expect(manifest, contains('android.intent.action.TTS_SERVICE'));
     expect(manifest, contains('android:label="Айла"'));
   });
+
+  testWidgets('телефон: доска и игры на главном экране без прокрутки', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    _phoneView(tester);
+    final state = await AppState.load();
+    state.addProfile(name: 'Айла', age: 5, language: AppLanguage.ru);
+    state.setPin('1234');
+    await tester.pumpWidget(MyApp(appState: state));
+    await tester.pumpAndSettle();
+    final height = tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    for (final text in ['Доска общения', 'НАЧАТЬ ПУТЕШЕСТВИЕ', 'Настройки']) {
+      final rect = tester.getRect(find.textContaining(text).first);
+      expect(rect.bottom, lessThan(height - 80), reason: text);
+    }
+  });
+
+  testWidgets('удаление профиля: данные и журнал этого ребёнка', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(900, 2600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final state = await AppState.load();
+    state.addProfile(name: 'Первый', age: 5, language: AppLanguage.ru);
+    state.logPhrase(text: 'Я хочу яблоко', cards: 2);
+    state.addProfile(name: 'Второй', age: 6, language: AppLanguage.ru);
+    state.logPhrase(text: 'Я хочу мяч', cards: 2);
+    state.setPin('1234');
+    await tester.pumpWidget(MyApp(appState: state));
+    await tester.pumpAndSettle();
+    final nav = tester.state<NavigatorState>(find.byType(Navigator));
+    nav.push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
+    await tester.pumpAndSettle();
+
+    // «Отмена» ничего не удаляет.
+    await tester.tap(find.text('Удалить текущий профиль'));
+    await tester.pumpAndSettle();
+    expect(find.text('Удалить профиль «Второй»?'), findsOneWidget);
+    await tester.tap(find.text('Отмена'));
+    await tester.pumpAndSettle();
+    expect(state.profiles.length, 2);
+
+    await tester.tap(find.text('Удалить текущий профиль'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Удалить'));
+    await tester.pumpAndSettle();
+    expect(state.profiles.map((p) => p.name), ['Первый']);
+    expect(state.activeProfile!.name, 'Первый');
+    expect(state.journalEntries.map((JournalEntry e) => e.text), ['Я хочу яблоко']);
+
+    final reloaded = await AppState.load();
+    expect(reloaded.profiles.length, 1);
+    expect(reloaded.journalEntries.length, 1);
+
+    // Последний профиль: приложение начинается с приветствия.
+    await tester.tap(find.text('Удалить текущий профиль'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Удалить'));
+    await tester.pumpAndSettle();
+    expect(state.hasProfile, isFalse);
+    expect(find.text('Начать'), findsOneWidget);
+  });
+}
+
+void _phoneView(WidgetTester tester) {
+  // Обычный телефон: 1080×2340 точек при плотности 2,75.
+  tester.view.physicalSize = const Size(1080, 2340);
+  tester.view.devicePixelRatio = 2.75;
+  addTearDown(tester.view.reset);
 }

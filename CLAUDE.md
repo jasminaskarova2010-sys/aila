@@ -76,6 +76,8 @@ There is **no account/login, no Firebase, no network** (TZ П7, "Что НЕ в�
 
 `AppState` (a `ChangeNotifier` exposed via `AppStateScope.of(context)`) is the single source of truth. It holds a list of `ChildProfile`s plus the active profile id, the parent PIN and device-wide settings (sound/music/vibration). **Per profile**: name, age, language, stars, owned/equipped outfits, completed game indices — getters like `stars`/`isOwned`/`isGameCompleted` read the active profile. Everything is saved on-device as one JSON blob in `shared_preferences` (key `aila_state_v1`) on every mutation via `_changed()`; add new persisted fields to both `toJson`/`fromJson` (with defaults, so old saves still load).
 
+`deleteProfile(id)` удаляет профиль и его журнал; файлы карточек родителя удаляет экран настроек через `ParentMedia.deleteFiles`. Если профилей не осталось, приложение возвращается к приветствию.
+
 Stars are honest: `completeGame(index, reward)` awards stars only on the **first** completion of a step and returns whether it did; replays are allowed but give nothing. `GamesFlowScreen` calls it with `kStarsPerGame` (50) and shows the "+50" snackbar only when stars were actually awarded.
 
 ### Localization (`lib/l10n/`)
@@ -91,6 +93,8 @@ Hand-rolled, not `flutter gen-l10n`/ARB-based. `AppLanguage` enum (ru/en/kk) + `
 The speak game is "Тренировка вместе с родителем": there is no speech recognition (out of MVP scope), so it must never auto-succeed. The app speaks `speakPhrase` via `flutter_tts` on tap of «Послушать», and the **adult** taps «Получилось» (→ normal success feedback → `onComplete`) or «Попробуем потом» (→ `onSkip`: next step, no stars, step stays uncompleted, neutral snackbar, no error state).
 
 **Visual content policy for game steps**: each `GameStep`'s imagery resolves in priority order — real photo (`imagePath`, files under `assets/games/<category>/`) → simple vector illustration (`pictogramBuilder`, hand-drawn `CustomPainter`s in `game_pictograms.dart`, used only for neutral objects where an abstract illustration can't distort meaning) → explicit "photo needed" placeholder (`promptPlaceholderNote` → `MissingPhotoPlaceholder`) when neither exists yet. **Never fall back to emoji for instructional content** — this was a deliberate, explicit product decision. Decorative chrome (background clouds/rocket, wardrobe icons, dialog titles) is exempt from this rule and may use emoji/Material icons freely.
+
+Тексты для ребёнка пишутся без рода («Получилось!», «Фраза собрана!», карточка «усталость»): в профиле нет пола, нельзя писать «Ты справился».
 
 Answer feedback in games is intentionally non-alarming: wrong answers get a neutral gray/muted "Попробуй ещё раз" prompt, never a red X or red text — this was also an explicit, deliberate ASD-friendly design decision; don't reintroduce red error states.
 

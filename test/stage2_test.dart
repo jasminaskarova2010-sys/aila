@@ -80,7 +80,7 @@ void main() {
 
     test('чувства и социальные слова не ломают фразу', () {
       expect(ru('i_feel hurts'), 'Мне больно');
-      expect(ru('i_feel tired'), 'Я устал');
+      expect(ru('i_feel tired'), 'Я чувствую усталость');
       expect(ru('i_want hurts'), 'Больно');
       expect(ru('i_want apple thanks'), 'Я хочу яблоко, спасибо');
     });

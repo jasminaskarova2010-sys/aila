@@ -277,6 +277,25 @@ class AppState extends ChangeNotifier {
     _changed();
   }
 
+  /// Удаляет профиль вместе с его журналом. Возвращает удалённый профиль, чтобы
+  /// экран мог убрать файлы его карточек. Если профилей не осталось, приложение
+  /// снова начинается с приветствия.
+  ChildProfile? deleteProfile(String id) {
+    final index = _profiles.indexWhere((p) => p.id == id);
+    if (index < 0) return null;
+    final removed = _profiles.removeAt(index);
+    if (_activeProfileId == id) {
+      _activeProfileId = _profiles.isEmpty ? null : _profiles.first.id;
+    }
+    _journal.removeWhere((e) => e.profileId == id);
+    _prefs.setString(
+      _journalKey,
+      jsonEncode(_journal.map((e) => e.toJson()).toList()),
+    );
+    _changed();
+    return removed;
+  }
+
   void switchProfile(String id) {
     if (_activeProfileId == id) return;
     _activeProfileId = id;

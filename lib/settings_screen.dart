@@ -1,9 +1,11 @@
 // lib/settings_screen.dart
 
 import 'package:flutter/material.dart';
+import 'board/parent_media.dart';
 import 'info_screen.dart';
 import 'l10n/app_language.dart';
 import 'l10n/strings.dart';
+import 'onboarding_screen.dart';
 import 'parent/board_settings_screen.dart';
 import 'parent/pin_screens.dart';
 import 'parent/print_cards.dart';
@@ -18,6 +20,46 @@ class SettingsScreen extends StatelessWidget {
 
   void _push(BuildContext context, Widget screen) {
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
+  Future<void> _deleteProfile(BuildContext context, ChildProfile profile) async {
+    final s = S.of(context);
+    final name = profile.name.isEmpty ? s.unnamedChild : profile.name;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFFFAF0EA),
+        title: Text(s.deleteProfileTitle(name)),
+        content: Text(s.deleteProfileBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(s.cancelButton),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(s.deleteButton),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    final appState = AppStateScope.of(context);
+    final removed = appState.deleteProfile(profile.id);
+    if (removed != null) {
+      ParentMedia.deleteFiles([
+        for (final card in removed.parentCards) ...[
+          card.imageFile,
+          card.audioFile,
+        ],
+      ]);
+    }
+    if (!appState.hasProfile) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -251,6 +293,14 @@ class SettingsScreen extends StatelessWidget {
                     onTap: () => _push(context, const ProfileFormScreen()),
                   ),
                   const _RowDivider(),
+                  if (activeProfile != null) ...[
+                    _NavigationRow(
+                      icon: Icons.delete_outline,
+                      label: s.deleteProfile,
+                      onTap: () => _deleteProfile(context, activeProfile),
+                    ),
+                    const _RowDivider(),
+                  ],
                   _NavigationRow(
                     icon: Icons.grid_view_rounded,
                     label: s.boardTitle,

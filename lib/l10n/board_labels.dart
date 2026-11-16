@@ -55,7 +55,7 @@ const Map<String, List<String>> _labels = {
   'good': ['хорошо', 'good', 'жақсы'],
   'bad': ['плохо', 'bad', 'жаман'],
   'hurts': ['больно', 'it hurts', 'ауырады'],
-  'tired': ['устал', 'tired', 'шаршадым'],
+  'tired': ['усталость', 'tired', 'шаршадым'],
   'sad': ['грустно', 'sad', 'мұңды'],
   'angry': ['злюсь', 'angry', 'ашулымын'],
   'scared': ['страшно', 'scared', 'қорқамын'],

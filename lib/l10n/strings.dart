@@ -113,11 +113,11 @@ class S {
       'Занятие завершено! 🎉', 'Session complete! 🎉', 'Сабақ аяқталды! 🎉');
   String sessionDoneBody(int stars) => stars > 0
       ? _t(
-          'Ты дошёл до конца сегодняшнего путешествия и заработал $stars ⭐. Отличная работа!',
+          'Путешествие на сегодня пройдено! Получено звёзд: $stars ⭐. Отличная работа!',
           "You reached the end of today's journey and earned $stars ⭐. Great work!",
           'Сен бүгінгі саяхаттың соңына жетіп, $stars ⭐ жинадың. Жарайсың!')
       : _t(
-          'Ты дошёл до конца сегодняшнего путешествия. Отличная работа!',
+          'Путешествие на сегодня пройдено. Отличная работа!',
           "You reached the end of today's journey. Great work!",
           'Сен бүгінгі саяхаттың соңына жеттің. Жарайсың!');
   String get sessionDoneOk => _t('Отлично!', 'Great!', 'Тамаша!');
@@ -523,19 +523,19 @@ class S {
           'Сөзді тыңдап, оның карточкасын бас.');
   String gameFindPrompt(String word) => _t('Найди: $word', 'Find: $word', 'Тап: $word');
   String get gameFindSuccess =>
-      _t('Ты нашёл все картинки!', 'You found all the pictures!', 'Сен барлық суретті таптың!');
+      _t('Все картинки найдены!', 'You found all the pictures!', 'Сен барлық суретті таптың!');
 
   String get gamePhraseTitle => _t('Собери фразу', 'Build the phrase', 'Сөйлем құра');
   String get gamePhraseSubtitle =>
       _t('Послушай фразу и нажми нужные карточки.', 'Listen to the phrase and tap the right cards.',
           'Сөйлемді тыңдап, керекті карточкаларды бас.');
   String get gamePhraseSuccess =>
-      _t('Ты собрал фразу!', 'You built the phrase!', 'Сен сөйлем құрадың!');
+      _t('Фраза собрана!', 'You built the phrase!', 'Сен сөйлем құрадың!');
 
   String get gameHappyTitle => _t('Кто счастлив?', 'Who is happy?', 'Кім бақытты?');
   String get gameHappySubtitle =>
       _t('Выбери мальчика, который счастлив.', 'Choose the boy who is happy.', 'Бақытты баланы таңда.');
-  String get gameHappySuccess => _t('Ты справился!', 'You did it!', 'Сен орындадың!');
+  String get gameHappySuccess => _t('Получилось!', 'You did it!', 'Сен орындадың!');
 
   String get gameStoryTitle => _t('Социальная история', 'Social story', 'Әлеуметтік әңгіме');
   String get gameStorySubtitle => _t(
@@ -561,7 +561,7 @@ class S {
       'Сурет керек: бала аспанды саусағымен көрсетіп тұр (ортақ зейін)');
   String get gameLookCaption => _t('Посмотри туда!', 'Look over there!', 'Анда қара!');
   String get gameLookSuccess => _t(
-      'Айла показывает на самолёт! Ты отлично справился!',
+      'Айла показывает на самолёт! Отлично получилось!',
       'Aila is pointing at the plane! Great job!',
       'Айла ұшақты көрсетіп тұр! Сен тамаша орындадың!');
 
@@ -687,4 +687,15 @@ class S {
   String get csvPhaseChange => _t('смена фазы', 'phase change', 'кезең ауысуы');
   String get csvAnswer => _t('ответ на вопрос', 'answer to a question', 'сұраққа жауап');
   String get csvSpontaneous => _t('спонтанно', 'spontaneous', 'өз бетінше');
+
+  // Удаление профиля
+  String get deleteProfile =>
+      _t('Удалить текущий профиль', 'Delete current profile', 'Ағымдағы профильді жою');
+  String deleteProfileTitle(String name) =>
+      _t('Удалить профиль «$name»?', 'Delete the profile "$name"?', '«$name» профилін жою керек пе?');
+  String get deleteProfileBody => _t(
+      'Удалятся звёзды, наряды, пройденные задания, карточки родителя с фото и голосом и журнал этого ребёнка. Отменить это нельзя.',
+      "This child's stars, outfits, completed tasks, parent cards with photos and voice, and journal will be deleted. This cannot be undone.",
+      'Осы баланың жұлдыздары, киімдері, орындалған тапсырмалары, суреті мен дауысы бар ата-ана карточкалары және журналы жойылады. Мұны қайтару мүмкін емес.');
+  String get deleteButton => _t('Удалить', 'Delete', 'Жою');
 }
