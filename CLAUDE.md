@@ -70,6 +70,8 @@ There is **no account/login, no Firebase, no network** (TZ П7, "Что НЕ в�
 
 **Parent PIN gate (`lib/parent/pin_screens.dart`)**: every adult-only screen (settings and anything reachable only from it: profiles, language, info, support contacts; later the parent section, links, journal) must be opened via `openParentArea(context, builder)`, never a bare `Navigator.push`. It shows `PinEntryScreen` and replaces it with the target on the correct PIN. Forgotten PIN → a random `a × b` multiplication challenge → `PinSetupScreen(isReset: true)` (protection from the child, not from an adult). `lib/parent/profile_form_screen.dart` creates/edits child profiles (name optional, age 2–12, language).
 
+**Айла на главном экране** (`lib/widgets/aila_hello.dart`): анимация из видео владелицы с убранным фоном, `assets/aila_hello.png` (APNG, 63 кадра). Проигрывается один раз при открытии и по нажатию, постоянного движения нет (П12). Новое видео на белом фоне превращается в такой файл скриптом `tool/cutout_video.swift` (инструкция в его начале); `ffmpeg` на этом Mac нет.
+
 `MainScreen` hosts the bottom nav with an `IndexedStack` of three tabs: `HomeTab`, `JourneyTab`, `WardrobeScreen`.
 
 ### Global state (`lib/state/app_state.dart`)

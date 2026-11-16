@@ -1,6 +1,7 @@
 // Проверки этапа 5 ТЗ: экран «О приложении», файлы сборки, тексты интерфейса.
 
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:aila_app/info_screen.dart';
 import 'package:aila_app/journal/journal.dart';
@@ -8,6 +9,7 @@ import 'package:aila_app/l10n/app_language.dart';
 import 'package:aila_app/main.dart';
 import 'package:aila_app/settings_screen.dart';
 import 'package:aila_app/state/app_state.dart';
+import 'package:aila_app/widgets/aila_hello.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -140,6 +142,30 @@ void main() {
     await tester.pumpAndSettle();
     expect(state.hasProfile, isFalse);
     expect(find.text('Начать'), findsOneWidget);
+  });
+
+  testWidgets('Айла на главном экране: анимация с прозрачным фоном', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final state = await AppState.load();
+    state.addProfile(name: 'Айла', age: 5, language: AppLanguage.ru);
+    state.setPin('1234');
+    await tester.pumpWidget(MyApp(appState: state));
+    await tester.pumpAndSettle();
+    expect(find.byType(AilaHello), findsOneWidget);
+
+    // Файл читается как анимация из многих кадров, угол кадра прозрачный.
+    final bytes = File('assets/aila_hello.png').readAsBytesSync();
+    await tester.runAsync(() async {
+      final codec = await ui.instantiateImageCodec(bytes);
+      expect(codec.frameCount, greaterThan(30));
+      final frame = (await codec.getNextFrame()).image;
+      final pixels = (await frame.toByteData())!;
+      expect(pixels.getUint8(3), 0);
+      final center = (frame.height ~/ 2 * frame.width + frame.width ~/ 2) * 4;
+      expect(pixels.getUint8(center + 3), greaterThan(250));
+    });
   });
 }
 

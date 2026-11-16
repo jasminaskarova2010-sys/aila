@@ -9,6 +9,7 @@ import '../board/board_screen.dart';
 import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
 import '../state/app_state.dart';
+import 'aila_hello.dart';
 
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
@@ -130,15 +131,11 @@ class HomeTab extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        // Звёздочка поменьше и рядом с облачком: на телефоне доска
+                        // Айла машет рядом с облачком, поменьше прежней картинки: на телефоне доска
                         // и игры должны помещаться на первом экране без прокрутки.
                         Row(
                           children: [
-                            Image.asset(
-                              'assets/star_mascot.png',
-                              width: 96,
-                              fit: BoxFit.contain,
-                            ),
+                            const AilaHello(size: 120),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Container(
