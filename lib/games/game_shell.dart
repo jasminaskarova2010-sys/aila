@@ -6,6 +6,7 @@ import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
 import '../state/app_state.dart';
 import 'game_audio.dart';
+import '../widgets/aila_face.dart';
 import '../widgets/aila_hello.dart';
 import 'missing_photo_placeholder.dart';
 
@@ -178,7 +179,7 @@ class GameShell extends StatelessWidget {
   }
 }
 
-/// Айла хвалит по-разному: машет и подмигивает, подмигивает, улыбается.
+/// Айла хвалит по-разному: радуется, подмигивает, обнимает сердечко, машет.
 /// Выбор зависит от номера задания, а не от случая: так предсказуемее (П4).
 class _AilaPraise extends StatelessWidget {
   final int index;
@@ -187,23 +188,24 @@ class _AilaPraise extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (index % 3) {
+    switch (index % 6) {
       case 0:
-        return const AilaHello(size: 72);
+        return const AilaFace(AilaMood.excited, size: 80);
       case 1:
+        return const AilaHello(size: 80);
+      case 2:
+        return const AilaFace(AilaMood.joy, size: 80);
+      case 3:
+        return const AilaFace(AilaMood.content, size: 80);
+      case 4:
         return Image.asset(
           'assets/aila_wink.png',
-          width: 72,
-          height: 72,
+          width: 80,
+          height: 80,
           fit: BoxFit.contain,
         );
       default:
-        return Image.asset(
-          'assets/star_mascot.png',
-          width: 72,
-          height: 72,
-          fit: BoxFit.contain,
-        );
+        return const AilaFace(AilaMood.hug, size: 80);
     }
   }
 }

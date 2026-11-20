@@ -74,7 +74,9 @@ class _JourneyTitlesSheet extends StatelessWidget {
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                       child: Row(
                         children: [
                           CircleAvatar(
@@ -100,8 +102,10 @@ class _JourneyTitlesSheet extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Icon(Icons.chevron_right,
-                              color: const Color(0xFF331A47).withOpacity(0.4)),
+                          Icon(
+                            Icons.chevron_right,
+                            color: const Color(0xFF331A47).withOpacity(0.4),
+                          ),
                         ],
                       ),
                     ),

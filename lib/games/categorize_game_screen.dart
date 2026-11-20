@@ -80,7 +80,10 @@ class _CategorizeGameScreenState extends State<CategorizeGameScreen> {
                 if (pictogramBuilder != null) pictogramBuilder(30),
                 const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: color,
                     borderRadius: BorderRadius.circular(14),

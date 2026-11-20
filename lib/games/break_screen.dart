@@ -10,6 +10,7 @@ import '../board/board_words.dart';
 import '../board/pictogram_repository.dart';
 import '../l10n/strings.dart';
 import '../state/app_state.dart';
+import '../widgets/aila_face.dart';
 import '../widgets/primary_button.dart';
 
 /// Игры на сегодня закончились (лимит родителя). Доска общения работает.
@@ -28,7 +29,7 @@ class GameLimitScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset('assets/star_mascot.png', width: 160),
+                const AilaFace(AilaMood.sleep, size: 170),
                 const SizedBox(height: 20),
                 Text(
                   s.limitTitle,
@@ -163,6 +164,8 @@ class _BreakScreenState extends State<BreakScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                 child: Column(
                   children: [
+                    const AilaFace(AilaMood.sleep, size: 110),
+                    const SizedBox(height: 6),
                     // Нажатие на заголовок повторяет озвучку.
                     GestureDetector(
                       onTap: () => widget.speech.speakText(

@@ -12,6 +12,7 @@ import 'build_phrase_screen.dart';
 import 'categorize_game_screen.dart';
 import 'choice_game_screen.dart';
 import 'find_picture_screen.dart';
+import '../widgets/aila_face.dart';
 import 'game_audio.dart';
 import 'game_models.dart';
 import 'order_game_screen.dart';
@@ -193,9 +194,16 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: Text(
-          s.sessionDoneBody(_earnedStars),
-          style: const TextStyle(color: Color(0xFF331A47)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const AilaFace(AilaMood.hug, size: 120),
+            const SizedBox(height: 8),
+            Text(
+              s.sessionDoneBody(_earnedStars),
+              style: const TextStyle(color: Color(0xFF331A47)),
+            ),
+          ],
         ),
         actions: [
           TextButton(

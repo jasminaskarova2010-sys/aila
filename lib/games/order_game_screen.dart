@@ -219,7 +219,9 @@ class _OrderGameScreenState extends State<OrderGameScreen> {
                                     item.label,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
-                                        fontSize: 9, color: Color(0xFF331A47)),
+                                      fontSize: 9,
+                                      color: Color(0xFF331A47),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -243,12 +245,17 @@ class _OrderGameScreenState extends State<OrderGameScreen> {
             runSpacing: 12,
             alignment: WrapAlignment.center,
             children: _pool
-                .map((item) => Draggable<OrderItemData>(
-                      data: item,
-                      feedback: Opacity(opacity: 0.85, child: _chip(item)),
-                      childWhenDragging: Opacity(opacity: 0.3, child: _chip(item)),
+                .map(
+                  (item) => Draggable<OrderItemData>(
+                    data: item,
+                    feedback: Opacity(opacity: 0.85, child: _chip(item)),
+                    childWhenDragging: Opacity(
+                      opacity: 0.3,
                       child: _chip(item),
-                    ))
+                    ),
+                    child: _chip(item),
+                  ),
+                )
                 .toList(),
           ),
           if (_wrong) ...[
@@ -262,10 +269,7 @@ class _OrderGameScreenState extends State<OrderGameScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            TextButton(
-              onPressed: _reset,
-              child: Text(s.gameOrderReset),
-            ),
+            TextButton(onPressed: _reset, child: Text(s.gameOrderReset)),
           ],
         ],
       ),

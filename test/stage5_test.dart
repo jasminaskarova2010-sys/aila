@@ -10,6 +10,7 @@ import 'package:aila_app/main.dart';
 import 'package:aila_app/settings_screen.dart';
 import 'package:aila_app/wardrobe_screen.dart';
 import 'package:aila_app/state/app_state.dart';
+import 'package:aila_app/widgets/aila_face.dart';
 import 'package:aila_app/widgets/aila_hello.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -188,6 +189,20 @@ void main() {
     expect(find.text('Күлгін худи'), findsOneWidget);
     expect(find.text('Гардероб Айлы'), findsNothing);
     expect(find.byIcon(Icons.person), findsNothing);
+  });
+
+  testWidgets('все выражения Айлы на месте и с прозрачным фоном', (tester) async {
+    await tester.runAsync(() async {
+      for (final mood in AilaMood.values) {
+        final bytes = File(mood.asset).readAsBytesSync();
+        final codec = await ui.instantiateImageCodec(bytes);
+        final frame = (await codec.getNextFrame()).image;
+        final pixels = (await frame.toByteData())!;
+        expect(pixels.getUint8(3), 0, reason: '${mood.name}: угол не прозрачный');
+        final centre = (frame.height ~/ 2 * frame.width + frame.width ~/ 2) * 4;
+        expect(pixels.getUint8(centre + 3), greaterThan(200), reason: mood.name);
+      }
+    });
   });
 }
 

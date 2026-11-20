@@ -39,14 +39,21 @@ class OrderItemData {
   final Widget Function(double size)? pictogramBuilder;
   final String label;
 
-  const OrderItemData({this.imagePath, this.pictogramBuilder, required this.label});
+  const OrderItemData({
+    this.imagePath,
+    this.pictogramBuilder,
+    required this.label,
+  });
 }
 
 class CategorizeItemData {
   final Widget Function(double size) pictogramBuilder;
   final bool belongsToA;
 
-  const CategorizeItemData({required this.pictogramBuilder, required this.belongsToA});
+  const CategorizeItemData({
+    required this.pictogramBuilder,
+    required this.belongsToA,
+  });
 }
 
 /// Один раунд «Найди картинку».
@@ -182,7 +189,9 @@ GameStep? _buildPhraseStep(S s, BoardModel model, Random random) {
   final objects = model.gameObjects.toList()..shuffle(random);
   if (objects.isEmpty) return null;
   final target = objects.first;
-  final starter = boardWordById(model.phase == BoardPhase.vi ? 'i_see' : 'i_want')!;
+  final starter = boardWordById(
+    model.phase == BoardPhase.vi ? 'i_see' : 'i_want',
+  )!;
   final descriptions = model.phase == BoardPhase.ivPlus
       ? (model.visibleDescriptions.toList()..shuffle(random))
       : const <BoardWord>[];
@@ -202,8 +211,9 @@ GameStep? _buildPhraseStep(S s, BoardModel model, Random random) {
 
 GameStep? _sortStep(S s, BoardModel model, Random random) {
   List<BoardWord> pick(BoardCategory category) {
-    final words = model.gameObjects.where((w) => w.category == category).toList()
-      ..shuffle(random);
+    final words =
+        model.gameObjects.where((w) => w.category == category).toList()
+          ..shuffle(random);
     return words.take(3).toList();
   }
 
@@ -244,7 +254,10 @@ GameStep? _whatSaysStep(S s, BoardModel model, Random random) {
     promptSpeech: buildPhrase([boardWordById('i_want')!, target], s.lang),
     options: [
       for (final word in options)
-        ChoiceOption(pictogramBuilder: _picture(word), label: s.boardLabel(word)),
+        ChoiceOption(
+          pictogramBuilder: _picture(word),
+          label: s.boardLabel(word),
+        ),
     ],
     correctIndex: options.indexOf(target),
     successTitle: s.gameClever,
@@ -255,7 +268,10 @@ GameStep? _whatSaysStep(S s, BoardModel model, Random random) {
 GameStep? _repeatStep(S s, BoardModel model) {
   final pool = model.gameObjects;
   if (pool.isEmpty) return null;
-  final target = pool.firstWhere((w) => w.id == 'water', orElse: () => pool.first);
+  final target = pool.firstWhere(
+    (w) => w.id == 'water',
+    orElse: () => pool.first,
+  );
   return GameStep(
     id: 6,
     title: s.gameRepeatTitle,

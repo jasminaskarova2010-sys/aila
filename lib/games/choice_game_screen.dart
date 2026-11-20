@@ -86,15 +86,16 @@ class _ChoiceGameScreenState extends State<ChoiceGameScreen> {
               final showResult = isSelected;
               final borderColor = showResult && isCorrect
                   ? const Color(0xFF6EA34F)
-                  : (showResult
-                      ? const Color(0xFFB3ACC0)
-                      : Colors.transparent);
+                  : (showResult ? const Color(0xFFB3ACC0) : Colors.transparent);
 
               final hasImage = option.imagePath != null;
-              final hasVisual = hasImage ||
+              final hasVisual =
+                  hasImage ||
                   option.pictogramBuilder != null ||
                   option.placeholderNote != null;
-              final cardWidth = hasVisual ? 130.0 : (option.label != null ? 150.0 : 100.0);
+              final cardWidth = hasVisual
+                  ? 130.0
+                  : (option.label != null ? 150.0 : 100.0);
 
               return Material(
                 color: Colors.transparent,

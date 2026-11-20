@@ -34,8 +34,10 @@ class _BallPainter extends CustomPainter {
     final pentagon = Path();
     for (var i = 0; i < 5; i++) {
       final angle = -pi / 2 + i * 2 * pi / 5;
-      final p = Offset(center.dx + r * 0.42 * cos(angle),
-          center.dy + r * 0.42 * sin(angle));
+      final p = Offset(
+        center.dx + r * 0.42 * cos(angle),
+        center.dy + r * 0.42 * sin(angle),
+      );
       if (i == 0) {
         pentagon.moveTo(p.dx, p.dy);
       } else {
@@ -70,7 +72,10 @@ class _TeddyPainter extends CustomPainter {
     canvas.drawCircle(Offset(w * 0.5, _h(w, 0.36)), w * 0.28, furPaint);
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(w * 0.5, _h(w, 0.72)), width: w * 0.62, height: w * 0.5),
+        center: Offset(w * 0.5, _h(w, 0.72)),
+        width: w * 0.62,
+        height: w * 0.5,
+      ),
       furPaint,
     );
     final earInner = Paint()..color = const Color(0xFFE7C9A3);
@@ -121,7 +126,10 @@ class _GrapesPainter extends CustomPainter {
       ..strokeWidth = w * 0.04
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(
-        Offset(w * 0.5, _h(w, 0.12)), Offset(w * 0.5, _h(w, 0.26)), stemPaint);
+      Offset(w * 0.5, _h(w, 0.12)),
+      Offset(w * 0.5, _h(w, 0.26)),
+      stemPaint,
+    );
     final leafPaint = Paint()..color = const Color(0xFF6EA34F);
     final leaf = Path()
       ..moveTo(w * 0.5, _h(w, 0.16))
@@ -276,7 +284,10 @@ class _BalloonPainter extends CustomPainter {
     final paint = Paint()..color = const Color(0xFFE0A93E);
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(w * 0.5, _h(w, 0.36)), width: w * 0.56, height: w * 0.62),
+        center: Offset(w * 0.5, _h(w, 0.36)),
+        width: w * 0.56,
+        height: w * 0.62,
+      ),
       paint,
     );
     final stringPaint = Paint()
@@ -310,7 +321,10 @@ class _BirdPainter extends CustomPainter {
     final bodyPaint = Paint()..color = const Color(0xFF6E93C4);
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(w * 0.48, _h(w, 0.52)), width: w * 0.56, height: w * 0.4),
+        center: Offset(w * 0.48, _h(w, 0.52)),
+        width: w * 0.56,
+        height: w * 0.4,
+      ),
       bodyPaint,
     );
     canvas.drawCircle(Offset(w * 0.74, _h(w, 0.36)), w * 0.16, bodyPaint);
