@@ -354,17 +354,17 @@ List<GameStep> buildGameSteps(S s, BoardModel model, {Random? random}) {
       ChoiceOption(
         number: 1,
         label: s.gameDoLaugh,
-        placeholderNote: s.gameDoLaughPhotoNote,
+        imagePath: 'assets/games/social/laughing_at_friend.jpg',
       ),
       ChoiceOption(
         number: 2,
         label: s.gameDoHelp,
-        placeholderNote: s.gameDoHelpPhotoNote,
+        imagePath: 'assets/games/social/helping_friend.jpg',
       ),
       ChoiceOption(
         number: 3,
         label: s.gameDoIgnore,
-        placeholderNote: s.gameDoIgnorePhotoNote,
+        imagePath: 'assets/games/social/walking_away.jpg',
       ),
     ],
     correctIndex: 1,

@@ -557,10 +557,6 @@ class S {
       'Посмотри, куда показывает Айла. Нажми на правильный предмет.',
       'See where Aila is pointing. Tap the right object.',
       'Айланың қайда көрсетіп тұрғанын қара. Дұрыс затты бас.');
-  String get gameLookPhotoNote => _t(
-      'Нужно фото: ребёнок показывает пальцем в небо (совместное внимание)',
-      'Photo needed: a child pointing at the sky (joint attention)',
-      'Сурет керек: бала аспанды саусағымен көрсетіп тұр (ортақ зейін)');
   String get gameLookCaption => _t('Посмотри туда!', 'Look over there!', 'Анда қара!');
   String get gameLookSuccess => _t(
       'Айла показывает на самолёт! Отлично получилось!',
@@ -625,23 +621,11 @@ class S {
       'A friend fell on the playground and started crying. What will you do?',
       'Досың алаңда құлап, жылап қалды. Не істейсің?');
   String get gameDoLaugh => _t('Посмеяться и уйти', 'Laugh and walk away', 'Күліп, кетіп қалу');
-  String get gameDoLaughPhotoNote => _t(
-      'Нужно фото: ребёнок смеётся и уходит',
-      'Photo needed: a child laughs and walks away',
-      'Сурет керек: бала күліп, кетіп барады');
   String get gameDoHelp => _t('Подойти и помочь', 'Go and help', 'Жақындап, көмектесу');
-  String get gameDoHelpPhotoNote => _t(
-      'Нужно фото: ребёнок подходит и протягивает руку',
-      'Photo needed: a child comes over and offers a hand',
-      'Сурет керек: бала жақындап, қолын созып тұр');
   String get gameDoIgnore => _t(
       'Пройти мимо, как будто ничего не случилось',
       'Walk past as if nothing happened',
       'Ештеңе болмағандай өтіп кету');
-  String get gameDoIgnorePhotoNote => _t(
-      'Нужно фото: ребёнок проходит мимо, не реагируя',
-      'Photo needed: a child walks past without reacting',
-      'Сурет керек: бала елемей өтіп барады');
   String get gameDoSuccess => _t(
       'Подойти и помочь — это правильный выбор!',
       'Going to help is the right choice!',

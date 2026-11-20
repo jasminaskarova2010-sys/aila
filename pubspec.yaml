@@ -48,6 +48,9 @@ flutter:
     - assets/games/social/shouting_child.PNG
     - assets/games/social/running_child.PNG
     - assets/games/social/comforting_friend.PNG
+    - assets/games/social/laughing_at_friend.jpg
+    - assets/games/social/helping_friend.jpg
+    - assets/games/social/walking_away.jpg
     - assets/games/daily-life/waking_up.PNG
     - assets/games/daily-life/brushing_teeth.PNG
     - assets/games/daily-life/eating_breakfast.PNG
