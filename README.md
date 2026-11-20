@@ -36,6 +36,8 @@ flutter analyze lib/        # проверка кода
 flutter test                # автотесты
 ```
 
+Контакты на экране «Поддержка» в репозитории не хранятся. Чтобы они появились, скопируйте `support_contacts.example.json` в `support_contacts.json`, впишите контакты и добавляйте к `flutter run` и `flutter build` флаг `--dart-define-from-file=support_contacts.json`.
+
 ## Где что лежит
 
 | Папка | Что там |

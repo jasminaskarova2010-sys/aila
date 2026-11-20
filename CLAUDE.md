@@ -32,13 +32,15 @@ This is not a licensed/official PECS implementation — avoid calling it that in
 ```bash
 flutter pub get             # install dependencies after editing pubspec.yaml
 flutter analyze lib/        # static analysis — run after every change, must be clean (infos like deprecated withOpacity are pre-existing and OK)
-flutter run -d macos        # run on macOS desktop (primary dev target used in this repo)
+flutter run -d macos --dart-define-from-file=support_contacts.json        # run on macOS desktop (primary dev target used in this repo)
 flutter devices             # list available run targets
-flutter build apk --release # тестовая сборка для Android: build/app/outputs/flutter-apk/app-release.apk
+flutter build apk --release --dart-define-from-file=support_contacts.json # тестовая сборка для Android: build/app/outputs/flutter-apk/app-release.apk
 flutter test                # widget/unit tests in test/, по файлу на этап (stage1_test.dart … stage5_test.dart, extras_test.dart)
 ```
 
-There is no CI config. `flutter_tts` has no test implementation — tests that open screens using TTS mock the `flutter_tts` MethodChannel.
+**Контакты поддержки** (телефоны и почта на экране «Поддержка») не хранятся в коде: репозиторий открытый. Они лежат в `support_contacts.json` (в `.gitignore`, образец `support_contacts.example.json`) и подставляются флагом `--dart-define-from-file=support_contacts.json` при каждом `flutter run`/`flutter build`. Без флага экран поддержки показывается без контактов. Никогда не вписывать их в `.dart`-файлы.
+
+CI: `.github/workflows/check.yml` (analyze + test на GitHub при каждой загрузке). Репозиторий: https://github.com/jasminaskarova2010-sys/aila. `flutter_tts` has no test implementation — tests that open screens using TTS mock the `flutter_tts` MethodChannel.
 
 Android SDK стоит в `~/Library/Android/sdk`, JDK 17 в `~/Library/Java/JavaVirtualMachines`, эмулятор `aila_test`. Файл для Android подписан служебным ключом `~/.android/debug.keystore`: для пилота можно, для Google Play нужны свой ключ и идентификатор вместо `com.example.aila_app`. Аудит — `docs/AUDIT.md`, инструкция для семей — `docs/PILOT_GUIDE.md`, шаги для iPhone — `docs/IOS_TESTFLIGHT.md`.
 
@@ -51,7 +53,7 @@ Android SDK стоит в `~/Library/Android/sdk`, JDK 17 в `~/Library/Java/Jav
 This repo is developed/tested primarily via `flutter run -d macos`, backgrounded with output piped to a log file, then polled until `Built build/...` or `BUILD FAILED` appears, e.g.:
 
 ```bash
-flutter run -d macos 2>&1 | tee /tmp/flutter_run.log &
+flutter run -d macos --dart-define-from-file=support_contacts.json 2>&1 | tee /tmp/flutter_run.log &
 # poll for "Built build" / "BUILD FAILED" / "error:" in the log, then verify the process is alive
 pgrep -x "aila_app"
 ```

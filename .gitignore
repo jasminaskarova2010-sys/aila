@@ -63,3 +63,6 @@ GoogleService-Info.plist
 **/firebase_options.dart
 service-account*.json
 .claude/settings.local.json
+
+# Контакты поддержки (личные): подставляются при сборке, см. lib/support_contacts.dart
+support_contacts.json

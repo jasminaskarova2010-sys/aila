@@ -3,20 +3,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'l10n/strings.dart';
+import 'support_contacts.dart';
 
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});
 
   void _copyToClipboard(BuildContext context, String value, String message) {
     Clipboard.setData(ClipboardData(text: value));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
+    final contacts = <Widget>[
+      if (kSupportPhone1.isNotEmpty)
+        _ContactRow(
+          icon: Icons.phone,
+          label: s.phone1Label,
+          value: kSupportPhone1,
+          onTap: () =>
+              _copyToClipboard(context, kSupportPhone1, s.numberCopied),
+        ),
+      if (kSupportPhone2.isNotEmpty)
+        _ContactRow(
+          icon: Icons.phone,
+          label: s.phone2Label,
+          value: kSupportPhone2,
+          onTap: () =>
+              _copyToClipboard(context, kSupportPhone2, s.numberCopied),
+        ),
+      if (kSupportEmail.isNotEmpty)
+        _ContactRow(
+          icon: Icons.email,
+          label: s.emailLabel,
+          value: kSupportEmail,
+          onTap: () => _copyToClipboard(context, kSupportEmail, s.emailCopied),
+        ),
+    ];
     return Scaffold(
       backgroundColor: const Color(0xFFFAF0EA),
       body: SafeArea(
@@ -47,8 +73,11 @@ class SupportScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.arrow_back,
-                            color: Color(0xFF331A47), size: 20),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: Color(0xFF331A47),
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -66,55 +95,36 @@ class SupportScreen extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 s.supportSubtitle,
-                style: const TextStyle(
-                  color: Color(0xFF9B8FAE),
-                  fontSize: 15,
-                ),
+                style: const TextStyle(color: Color(0xFF9B8FAE), fontSize: 15),
               ),
               const SizedBox(height: 24),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF331A47).withOpacity(0.06),
-                      offset: const Offset(0, 6),
-                      blurRadius: 14,
-                    ),
-                  ],
+              if (contacts.isNotEmpty) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF331A47).withOpacity(0.06),
+                        offset: const Offset(0, 6),
+                        blurRadius: 14,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      for (final (i, row) in contacts.indexed) ...[
+                        if (i > 0)
+                          const Divider(height: 1, color: Color(0xFFEDE6DC)),
+                        row,
+                      ],
+                    ],
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    _ContactRow(
-                      icon: Icons.phone,
-                      label: s.phone1Label,
-                      value: '',
-                      onTap: () => _copyToClipboard(
-                          context, '', s.numberCopied),
-                    ),
-                    const Divider(height: 1, color: Color(0xFFEDE6DC)),
-                    _ContactRow(
-                      icon: Icons.phone,
-                      label: s.phone2Label,
-                      value: '',
-                      onTap: () => _copyToClipboard(
-                          context, '', s.numberCopied),
-                    ),
-                    const Divider(height: 1, color: Color(0xFFEDE6DC)),
-                    _ContactRow(
-                      icon: Icons.email,
-                      label: s.emailLabel,
-                      value: '',
-                      onTap: () => _copyToClipboard(
-                          context, '', s.emailCopied),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
+              ],
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -133,8 +143,11 @@ class SupportScreen extends StatelessWidget {
                         color: const Color(0xFF8677A5),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.favorite,
-                          color: Colors.white, size: 20),
+                      child: const Icon(
+                        Icons.favorite,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
