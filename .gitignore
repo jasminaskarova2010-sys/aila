@@ -46,3 +46,20 @@ app.*.map.json
 
 # Claude Code local lock files
 .claude/scheduled_tasks.lock
+
+# Секреты и ключи: никогда не добавлять в репозиторий
+.env
+.env.*
+*.env
+key.properties
+*.jks
+*.keystore
+*.p12
+*.p8
+*.pem
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+**/firebase_options.dart
+service-account*.json
+.claude/settings.local.json
