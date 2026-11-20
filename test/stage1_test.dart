@@ -29,8 +29,8 @@ void main() {
     expect(state.completeGame(0, 50), isTrue);
     expect(state.completeGame(0, 50), isFalse);
     expect(state.stars, 50);
-    expect(state.purchase('cap', 30), isTrue);
-    state.equip('cap');
+    expect(state.purchase('hat_cap', 30), isTrue);
+    state.setLook(['hat_cap']);
     state.setSoundEnabled(false);
 
     // «Перезапуск»: читаем состояние заново из хранилища.
@@ -40,8 +40,8 @@ void main() {
     expect(profile.age, 5);
     expect(profile.language, AppLanguage.kk);
     expect(reloaded.stars, 20);
-    expect(reloaded.isOwned('cap'), isTrue);
-    expect(reloaded.equippedOutfitId, 'cap');
+    expect(reloaded.isOwned('hat_cap'), isTrue);
+    expect(reloaded.equippedItemIds, ['hat_cap']);
     expect(reloaded.isGameCompleted(0), isTrue);
     expect(reloaded.completeGame(0, 50), isFalse);
     expect(reloaded.soundEnabled, isFalse);

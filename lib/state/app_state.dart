@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../board/board_words.dart';
+import '../wardrobe/wardrobe_items.dart';
 import '../journal/journal.dart';
 import '../l10n/app_language.dart';
 import '../survey/survey_data.dart';
@@ -19,7 +20,8 @@ class ChildProfile {
   AppLanguage language;
   int stars;
   final Set<String> ownedOutfitIds;
-  String equippedOutfitId;
+  /// Надетые на Айлу аксессуары (по одному на место).
+  List<String> equippedItemIds;
   final Set<int> completedGameIndices;
 
   /// День, к которому относятся пройденные задания («Путешествие дня»).
@@ -54,7 +56,7 @@ class ChildProfile {
     required this.language,
     this.stars = 0,
     Set<String>? ownedOutfitIds,
-    this.equippedOutfitId = 'default',
+    List<String>? equippedItemIds,
     Set<int>? completedGameIndices,
     this.journeyDate,
     this.gameLimitMinutes = 0,
@@ -73,6 +75,7 @@ class ChildProfile {
     List<SurveyAnswer>? surveyAnswers,
     this.lastSurveyAt,
   }) : ownedOutfitIds = ownedOutfitIds ?? {'default'},
+       equippedItemIds = equippedItemIds ?? [],
        completedGameIndices = completedGameIndices ?? {},
        favoriteWordIds = favoriteWordIds ?? List.of(kDefaultFavoriteIds),
        hiddenWordIds = hiddenWordIds ?? {},
@@ -87,7 +90,7 @@ class ChildProfile {
     'language': language.name,
     'stars': stars,
     'ownedOutfitIds': ownedOutfitIds.toList(),
-    'equippedOutfitId': equippedOutfitId,
+    'equippedItemIds': equippedItemIds,
     'completedGameIndices': completedGameIndices.toList(),
     'journeyDate': journeyDate,
     'gameLimitMinutes': gameLimitMinutes,
@@ -119,7 +122,9 @@ class ChildProfile {
       'default',
       ...(json['ownedOutfitIds'] as List? ?? []).cast<String>(),
     },
-    equippedOutfitId: json['equippedOutfitId'] as String? ?? 'default',
+    equippedItemIds: normalizeLook(
+      (json['equippedItemIds'] as List? ?? []).cast<String>(),
+    ),
     journeyDate: json['journeyDate'] as String?,
     gameLimitMinutes: json['gameLimitMinutes'] as int? ?? 0,
     playedDate: json['playedDate'] as String?,
@@ -368,7 +373,8 @@ class AppState extends ChangeNotifier {
   // Звёзды, наряды, задания (текущего профиля)
 
   int get stars => activeProfile?.stars ?? 0;
-  String get equippedOutfitId => activeProfile?.equippedOutfitId ?? 'default';
+  List<String> get equippedItemIds =>
+      List.unmodifiable(activeProfile?.equippedItemIds ?? const <String>[]);
   /// Часы приложения. В тестах подменяются, чтобы проверить смену дня.
   static DateTime Function() clock = DateTime.now;
 
@@ -446,12 +452,13 @@ class AppState extends ChangeNotifier {
     return true;
   }
 
-  void equip(String id) {
+  /// Надевает образ. Берутся только купленные предметы, по одному на место.
+  void setLook(Iterable<String> ids) {
     final profile = activeProfile;
     if (profile == null) return;
-    if (!profile.ownedOutfitIds.contains(id)) return;
-    if (profile.equippedOutfitId == id) return;
-    profile.equippedOutfitId = id;
+    profile.equippedItemIds = normalizeLook(
+      ids.where(profile.ownedOutfitIds.contains),
+    );
     _changed();
   }
 

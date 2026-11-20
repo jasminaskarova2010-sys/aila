@@ -8,6 +8,7 @@ import 'package:aila_app/journal/journal.dart';
 import 'package:aila_app/l10n/app_language.dart';
 import 'package:aila_app/main.dart';
 import 'package:aila_app/settings_screen.dart';
+import 'package:aila_app/wardrobe/wardrobe_items.dart';
 import 'package:aila_app/wardrobe_screen.dart';
 import 'package:aila_app/state/app_state.dart';
 import 'package:aila_app/widgets/aila_face.dart';
@@ -186,7 +187,7 @@ void main() {
         .push(MaterialPageRoute(builder: (_) => const WardrobeScreen()));
     await tester.pumpAndSettle();
     expect(find.text('Айланың киім шкафы'), findsOneWidget);
-    expect(find.text('Күлгін худи'), findsOneWidget);
+    expect(find.text('Күлгін құлаққап'), findsOneWidget);
     expect(find.text('Гардероб Айлы'), findsNothing);
     expect(find.byIcon(Icons.person), findsNothing);
   });
@@ -203,6 +204,91 @@ void main() {
         expect(pixels.getUint8(centre + 3), greaterThan(200), reason: mood.name);
       }
     });
+  });
+
+  group('гардероб: примерка, покупка, образ', () {
+    Future<AppState> openWardrobe(WidgetTester tester, {int stars = 0}) async {
+      SharedPreferences.setMockInitialValues({});
+      tester.view.physicalSize = const Size(900, 2600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final state = await AppState.load();
+      state.addProfile(name: 'Айла', age: 5, language: AppLanguage.ru);
+      state.setPin('1234');
+      for (var i = 0; i * 50 < stars; i++) {
+        state.completeGame(i, 50);
+      }
+      await tester.pumpWidget(MyApp(appState: state));
+      await tester.pumpAndSettle();
+      tester
+          .state<NavigatorState>(find.byType(Navigator))
+          .push(MaterialPageRoute(builder: (_) => const WardrobeScreen()));
+      await tester.pumpAndSettle();
+      return state;
+    }
+
+    testWidgets('надеть на пробу, купить за звёзды, образ сохраняется', (
+      tester,
+    ) async {
+      final state = await openWardrobe(tester, stars: 300);
+      expect(state.stars, 300);
+
+      await tester.tap(find.text('Панама'));
+      await tester.pumpAndSettle();
+      // Шапка и корона занимают одно место: остаётся последняя нажатая.
+      await tester.tap(find.text('Золотая корона'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Очки-сердечки'));
+      await tester.pumpAndSettle();
+
+      // Пока не куплено, ничего не списано и не надето.
+      expect(state.stars, 300);
+      expect(state.equippedItemIds, isEmpty);
+      expect(find.text('Купить за 310'), findsOneWidget);
+      await tester.tap(find.text('Купить за 310'));
+      await tester.pumpAndSettle();
+      // 310 > 300: покупка не прошла.
+      expect(find.text('Недостаточно звёзд'), findsOneWidget);
+      expect(state.stars, 300);
+      expect(state.isOwned('crown_gold'), isFalse);
+
+      // Снимаем корону, остаются очки (110) и панама вместо неё.
+      await tester.pump(const Duration(seconds: 5));
+      await tester.tap(find.text('Золотая корона'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Купить за 110'));
+      await tester.pumpAndSettle();
+      expect(state.stars, 190);
+      expect(state.equippedItemIds, ['glasses_heart']);
+      expect(find.text('Образ сохранён'), findsOneWidget);
+
+      final reloaded = await AppState.load();
+      expect(reloaded.equippedItemIds, ['glasses_heart']);
+      expect(reloaded.isOwned('glasses_heart'), isTrue);
+      expect(reloaded.stars, 190);
+    });
+
+    testWidgets('нет звёзд: покупка не проходит', (tester) async {
+      final state = await openWardrobe(tester);
+      await tester.tap(find.text('Берет'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Купить за 150'));
+      await tester.pumpAndSettle();
+      expect(find.text('Недостаточно звёзд'), findsOneWidget);
+      expect(state.isOwned('hat_beret'), isFalse);
+      expect(state.equippedItemIds, isEmpty);
+    });
+  });
+
+  test('образ: по одному предмету на место, неизвестные отбрасываются', () {
+    expect(normalizeLook(['hat_bucket', 'crown_gold', 'glasses_black']), [
+      'crown_gold',
+      'glasses_black',
+    ]);
+    expect(normalizeLook(['hoodie_purple', 'bow_pink']), ['bow_pink']);
+    for (final item in kWardrobeItems) {
+      expect(File(item.asset).existsSync(), isTrue, reason: item.id);
+    }
   });
 }
 

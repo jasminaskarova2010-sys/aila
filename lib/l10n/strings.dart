@@ -3,6 +3,7 @@
 import 'package:flutter/widgets.dart';
 import '../board/board_words.dart';
 import '../survey/survey_data.dart';
+import '../wardrobe/wardrobe_items.dart';
 import 'app_language.dart';
 import 'board_labels.dart';
 
@@ -690,30 +691,62 @@ class S {
   String get wardrobeSubtitle =>
       _t('Выбирай и наряжай Айлу!', 'Choose an outfit for Aila!', 'Айлаға киім таңда!');
   String get wardrobeReset => _t('Сбросить', 'Reset', 'Тастау');
-  String get wardrobeSaved => _t('Наряд сохранён', 'Outfit saved', 'Киім сақталды');
+  String get wardrobeSaved => _t('Образ сохранён', 'Look saved', 'Образ сақталды');
   String get wardrobeNotEnoughStars =>
       _t('Недостаточно звёзд', 'Not enough stars', 'Жұлдыз жеткіліксіз');
   String get wardrobeOwned => _t('Есть', 'Owned', 'Бар');
   String wardrobeItemName(String id) {
     switch (id) {
-      case 'hoodie_purple':
-        return _t('Фиолетовое худи', 'Purple hoodie', 'Күлгін худи');
-      case 'tshirt_white':
-        return _t('Белая футболка', 'White T-shirt', 'Ақ футболка');
-      case 'dress_pink':
-        return _t('Розовое платье', 'Pink dress', 'Қызғылт көйлек');
-      case 'dragon_green':
-        return _t('Костюм дракона', 'Dragon costume', 'Айдаһар костюмі');
-      case 'sweater_yellow':
-        return _t('Жёлтый свитер', 'Yellow sweater', 'Сары свитер');
-      case 'overalls_blue':
-        return _t('Синий комбинезон', 'Blue overalls', 'Көк комбинезон');
-      case 'sailor':
-        return _t('Матроска', 'Sailor suit', 'Матрос киімі');
-      case 'royal_cape':
-        return _t('Мантия с короной', 'Cape and crown', 'Тәж бен мантия');
+      case 'hat_bucket':
+        return _t('Панама', 'Bucket hat', 'Панама');
+      case 'hat_beret':
+        return _t('Берет', 'Beret', 'Берет');
+      case 'hat_beanie':
+        return _t('Шапка с помпоном', 'Beanie', 'Помпонды бөрік');
+      case 'hat_cap':
+        return _t('Кепка', 'Cap', 'Кепка');
+      case 'glasses_flower':
+        return _t('Очки-цветочки', 'Flower glasses', 'Гүл көзілдірік');
+      case 'glasses_black':
+        return _t('Тёмные очки', 'Sunglasses', 'Қара көзілдірік');
+      case 'glasses_heart':
+        return _t('Очки-сердечки', 'Heart glasses', 'Жүрек көзілдірік');
+      case 'glasses_round':
+        return _t('Круглые очки', 'Round glasses', 'Дөңгелек көзілдірік');
+      case 'phones_purple':
+        return _t('Фиолетовые наушники', 'Purple headphones', 'Күлгін құлаққап');
+      case 'phones_cat':
+        return _t('Наушники с ушками', 'Cat-ear headphones', 'Мысық құлақты құлаққап');
+      case 'phones_blue':
+        return _t('Голубые наушники', 'Blue headphones', 'Көгілдір құлаққап');
+      case 'phones_cream':
+        return _t('Кремовые наушники', 'Cream headphones', 'Кілегей түсті құлаққап');
+      case 'bow_purple':
+        return _t('Фиолетовый бант', 'Purple bow', 'Күлгін бант');
+      case 'bow_pink':
+        return _t('Розовый бант', 'Pink bow', 'Қызғылт бант');
+      case 'bow_cream':
+        return _t('Кремовый бант', 'Cream bow', 'Кілегей түсті бант');
+      case 'bow_plaid':
+        return _t('Бант в клетку', 'Plaid bow', 'Шаршы бант');
+      case 'star_clip':
+        return _t('Заколка-звёздочка', 'Star clip', 'Жұлдызша түйреуіш');
+      case 'band_cat':
+        return _t('Ободок с ушками', 'Cat-ear headband', 'Мысық құлақты белдік');
+      case 'band_heart':
+        return _t('Ободок с сердечками', 'Heart headband', 'Жүрекшелі белдік');
+      case 'band_flowers':
+        return _t('Веночек', 'Flower crown', 'Гүл шоқ');
+      case 'band_bunny':
+        return _t('Ободок с зайчьими ушками', 'Bunny headband', 'Қоян құлақты белдік');
+      case 'crown_gold':
+        return _t('Золотая корона', 'Golden crown', 'Алтын тәж');
+      case 'tiara':
+        return _t('Диадема', 'Tiara', 'Диадема');
+      case 'sleep_mask':
+        return _t('Маска для сна', 'Sleep mask', 'Ұйқы маскасы');
       default:
-        return _t('Обычная Айла', 'Classic Aila', 'Әдеттегі Айла');
+        return id;
     }
   }
 
@@ -793,4 +826,25 @@ class S {
       'Show your parents: this is your reward!',
       'Ата-анаңа көрсет: бұл сенің сыйлығың!');
   String get breakRestOnly => _t('Давай отдохнём', "Let's rest", 'Демалайық');
+
+  String get wardrobeAll => _t('Всё', 'All', 'Барлығы');
+  String wardrobeCategory(WardrobeCategory category) {
+    switch (category) {
+      case WardrobeCategory.hats:
+        return _t('Шапки', 'Hats', 'Бөріктер');
+      case WardrobeCategory.glasses:
+        return _t('Очки', 'Glasses', 'Көзілдіріктер');
+      case WardrobeCategory.headphones:
+        return _t('Наушники', 'Headphones', 'Құлаққаптар');
+      case WardrobeCategory.bows:
+        return _t('Банты', 'Bows', 'Бантар');
+      case WardrobeCategory.headbands:
+        return _t('Ободки', 'Headbands', 'Белдіктер');
+      case WardrobeCategory.crowns:
+        return _t('Короны', 'Crowns', 'Тәждер');
+    }
+  }
+  String wardrobeBuy(int price) => _t('Купить за $price', 'Buy for $price', '$price-ға алу');
+  String get wardrobeSaveLook => _t('Сохранить образ', 'Save look', 'Образды сақтау');
+  String get wardrobeTakeOff => _t('Снять всё', 'Take all off', 'Бәрін шешу');
 }

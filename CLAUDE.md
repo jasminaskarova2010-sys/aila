@@ -134,9 +134,9 @@ Answer feedback in games is intentionally non-alarming: wrong answers get a neut
 
 Только на устройстве (П7): отдельный ключ `aila_journal_v1` в `shared_preferences`, последние 5000 записей, у каждого профиля свои. Фраза записывается по «Сказать», а в фазах III — по нажатию на карточку (`logPhrase`); смена фазы — в `setBoardPhase`. Ответом считается первая фраза в течение 2 минут после кнопки вопроса (`kAnswerWindow`). «Я хочу» считается карточкой. Экран «Сегодня» (настройки, за PIN) считает спонтанные фразы и фразы из 2+ карточек за день и за 7 дней, рисует фразы по дням и частые фразы. «Собрать документ специалисту» — PDF за 4 недели (`specialist_report.dart`), имя ребёнка родитель вписывает сам. «Поделиться отчётом» — CSV через `share_plus`: разделитель `;`, метка UTF-8 для Excel, имени ребёнка нет.
 
-### Wardrobe / rewards (`lib/wardrobe_screen.dart`, `lib/wardrobe/wardrobe_items.dart`)
+### Гардероб Айлы (`lib/wardrobe_screen.dart`, `lib/wardrobe/wardrobe_items.dart`, `lib/widgets/aila_with_items.dart`)
 
-Simple catalog of `WardrobeItem`s purchased with stars via `AppState.purchase`/`equip`. Decorative only — exempt from the "no emoji" content policy.
+24 аксессуара (шапки, очки, наушники, банты, ободки, короны) в `assets/wardrobe/*.png`, вырезаны из картинок владелицы скриптом `tool/cut_items.swift` (запуск — в начале файла). Каждый предмет описан в `kWardrobeItems`: цена, место на Айле (`WardrobeSlot`: в каждом месте один предмет), положение `cx/cy/width/rotation` в долях картинки Айлы (`assets/aila/aila_smile.png`). Предметы стоят на одной позе Айлы: на других выражениях положение не совпадёт. Нажатие на предмет надевает его на пробу, покупка и сохранение — одной кнопкой внизу (`AppState.purchase` + `setLook`). Образ хранится в профиле (`equippedItemIds`), старые наряды (`equippedOutfitId`) выброшены. Названия — `S.wardrobeItemName(id)` на трёх языках. Картинки исходно небольшие (~100 px), на крупных экранах слегка мягкие: если будут картинки покрупнее, пересобрать скриптом.
 
 ### Settings / static screens
 
