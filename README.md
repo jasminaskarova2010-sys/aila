@@ -1,17 +1,60 @@
-# aila_app
+# Айла
 
-A new Flutter project.
+Приложение на Flutter для детей с аутизмом (РАС) и задержкой речи и для их родителей.
+Языки: русский, английский, казахский.
 
-## Getting Started
+Приложение не заменяет занятий со специалистом.
 
-This project is a starting point for a Flutter application.
+## Что умеет
 
-A few resources to get you started if this is your first Flutter project:
+- **Доска общения.** Ребёнок собирает фразу из карточек, приложение её озвучивает. Доска меняется по фазам обучения (III-A … VI). Родитель может добавить свои карточки с фото и записью голоса.
+- **Путешествие дня.** Короткие задания: эмоции, социальные истории, последовательности, «Что делать?», «Найди картинку», «Собери фразу». Есть перерывы и лимит времени, который задаёт родитель.
+- **Звёзды и гардероб.** За задания ребёнок получает звёзды и покупает на них аксессуары для Айлы.
+- **Раздел для родителей (под PIN).**
+  - Опрос, который помогает выбрать фазу.
+  - Журнал фраз и экран «Сегодня».
+  - PDF-отчёт для специалиста и печать карточек.
+- **Спокойный стиль.** Пастельные цвета, ничего не мигает, нет красного цвета и звуков «неправильно».
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Это «карточки в стиле PECS», а не официальная программа PECS.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Приватность
+
+- Все данные хранятся только на устройстве.
+- В приложении нет входа в аккаунт, аналитики и рекламы.
+- В Android-манифесте нет разрешения на интернет.
+
+## Как запустить
+
+Нужен Flutter 3.44 или новее.
+
+```bash
+flutter pub get             # скачать пакеты
+flutter run -d macos        # запустить на Mac
+flutter build apk --release # собрать файл для Android
+flutter analyze lib/        # проверка кода
+flutter test                # автотесты
+```
+
+## Где что лежит
+
+| Папка | Что там |
+| --- | --- |
+| `lib/board/` | доска общения, сборка и озвучка фраз |
+| `lib/games/` | задания, перерыв, звуки |
+| `lib/parent/` | PIN, настройки, профили, отчёты |
+| `lib/survey/` | опрос родителя |
+| `lib/journal/` | журнал фраз (только на устройстве) |
+| `lib/wardrobe/`, `lib/wardrobe_screen.dart` | гардероб Айлы |
+| `lib/l10n/` | все тексты на трёх языках |
+| `assets/` | картинки, звуки, шрифты |
+| `tool/` | скрипты для подготовки картинок и звуков |
+| `test/` | автотесты |
+| `docs/` | ТЗ, аудит, инструкции для пилота и iPhone |
+
+Подробное устройство кода описано в [CLAUDE.md](CLAUDE.md).
+
+## Картинки и лицензии
+
+Карточки взяты из наборов Mulberry Symbols (CC BY-SA 4.0) и ARASAAC (CC BY-NC-SA, только некоммерческое использование).
+Список всех сторонних материалов и их лицензий: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
