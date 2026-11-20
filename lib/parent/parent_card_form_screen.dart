@@ -14,10 +14,12 @@ import '../l10n/strings.dart';
 import '../state/app_state.dart';
 import '../widgets/primary_button.dart';
 
-/// Новая карточка родителя: фото, подпись и (необязательно) запись голоса.
-/// Файлы остаются на устройстве (П7).
+/// Карточка родителя: фото, подпись и (необязательно) запись голоса.
+/// [editing] — исправить существующую. Файлы остаются на устройстве (П7).
 class ParentCardFormScreen extends StatefulWidget {
-  const ParentCardFormScreen({super.key});
+  final ParentCard? editing;
+
+  const ParentCardFormScreen({super.key, this.editing});
 
   @override
   State<ParentCardFormScreen> createState() => _ParentCardFormScreenState();
@@ -33,15 +35,18 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
     BoardCategory.places,
   ];
 
-  final String _cardId = 'parent_${DateTime.now().microsecondsSinceEpoch}';
-  final TextEditingController _label = TextEditingController();
+  late final String _cardId =
+      widget.editing?.id ?? 'parent_${DateTime.now().microsecondsSinceEpoch}';
+  late final TextEditingController _label = TextEditingController(
+    text: widget.editing?.label ?? '',
+  );
   final ImagePicker _picker = ImagePicker();
   final AudioRecorder _recorder = AudioRecorder();
   AudioPlayer? _player;
 
-  String? _imageFile;
-  String? _audioFile;
-  BoardCategory _category = BoardCategory.toys;
+  late String? _imageFile = widget.editing?.imageFile;
+  late String? _audioFile = widget.editing?.audioFile;
+  late BoardCategory _category = widget.editing?.category ?? BoardCategory.toys;
   bool _recording = false;
   bool _noMic = false;
 
@@ -102,15 +107,23 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
   Future<void> _save() async {
     if (_recording) await _recorder.stop();
     if (!mounted) return;
-    AppStateScope.of(context).addParentCard(
-      ParentCard(
-        id: _cardId,
-        label: _label.text.trim(),
-        category: _category,
-        imageFile: _imageFile!,
-        audioFile: _audioFile,
-      ),
+    final card = ParentCard(
+      id: _cardId,
+      label: _label.text.trim(),
+      category: _category,
+      imageFile: _imageFile!,
+      audioFile: _audioFile,
     );
+    final appState = AppStateScope.of(context);
+    final old = widget.editing;
+    if (old == null) {
+      appState.addParentCard(card);
+    } else {
+      appState.updateParentCard(card);
+      // Старое фото больше не нужно, если выбрали новое.
+      if (old.imageFile != card.imageFile)
+        ParentMedia.deleteFiles([old.imageFile]);
+    }
     Navigator.of(context).pop();
   }
 
@@ -125,7 +138,7 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
         elevation: 0,
         foregroundColor: BoardTheme.ink,
         title: Text(
-          s.addCard,
+          widget.editing == null ? s.addCard : s.editCard,
           style: const TextStyle(
             color: BoardTheme.ink,
             fontSize: 18,
@@ -158,7 +171,10 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => _pickImage(ImageSource.camera),
-                    icon: const Icon(Icons.photo_camera_outlined, color: BoardTheme.ink),
+                    icon: const Icon(
+                      Icons.photo_camera_outlined,
+                      color: BoardTheme.ink,
+                    ),
                     label: Text(
                       s.cardFromCamera,
                       style: const TextStyle(color: BoardTheme.ink),
@@ -170,7 +186,10 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () => _pickImage(ImageSource.gallery),
-                  icon: const Icon(Icons.photo_library_outlined, color: BoardTheme.ink),
+                  icon: const Icon(
+                    Icons.photo_library_outlined,
+                    color: BoardTheme.ink,
+                  ),
                   label: Text(
                     s.cardFromGallery,
                     style: const TextStyle(color: BoardTheme.ink),
@@ -207,7 +226,10 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
             ],
           ),
           _heading(s.cardVoice),
-          Text(s.cardVoiceHint, style: const TextStyle(color: BoardTheme.muted)),
+          Text(
+            s.cardVoiceHint,
+            style: const TextStyle(color: BoardTheme.muted),
+          ),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -221,7 +243,9 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
                   label: Text(
                     _recording
                         ? s.cardStopRecord
-                        : (_audioFile == null ? s.cardRecord : s.cardRecordAgain),
+                        : (_audioFile == null
+                              ? s.cardRecord
+                              : s.cardRecordAgain),
                     style: const TextStyle(color: BoardTheme.ink),
                   ),
                 ),
@@ -231,7 +255,10 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: _playRecording,
-                    icon: const Icon(Icons.volume_up_outlined, color: BoardTheme.ink),
+                    icon: const Icon(
+                      Icons.volume_up_outlined,
+                      color: BoardTheme.ink,
+                    ),
                     label: Text(
                       s.cardPlay,
                       style: const TextStyle(color: BoardTheme.ink),
@@ -244,7 +271,10 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
           if (_noMic)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Text(s.cardNoMic, style: const TextStyle(color: BoardTheme.muted)),
+              child: Text(
+                s.cardNoMic,
+                style: const TextStyle(color: BoardTheme.muted),
+              ),
             ),
           const SizedBox(height: 28),
           PrimaryButton(label: s.saveButton, onTap: canSave ? _save : null),

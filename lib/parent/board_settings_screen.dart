@@ -78,7 +78,11 @@ class _BoardSettingsScreenState extends State<BoardSettingsScreen> {
             _Card(
               child: Text(
                 s.noVoiceMessage,
-                style: const TextStyle(color: BoardTheme.ink, fontSize: 14, height: 1.35),
+                style: const TextStyle(
+                  color: BoardTheme.ink,
+                  fontSize: 14,
+                  height: 1.35,
+                ),
               ),
             ),
           ],
@@ -144,7 +148,10 @@ class _BoardSettingsScreenState extends State<BoardSettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(s.favoritesHint, style: const TextStyle(color: BoardTheme.muted)),
+                Text(
+                  s.favoritesHint,
+                  style: const TextStyle(color: BoardTheme.muted),
+                ),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 6,
@@ -167,35 +174,57 @@ class _BoardSettingsScreenState extends State<BoardSettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (profile.parentCards.isEmpty)
-                  Text(s.myCardsEmpty, style: const TextStyle(color: BoardTheme.muted))
+                  Text(
+                    s.myCardsEmpty,
+                    style: const TextStyle(color: BoardTheme.muted),
+                  )
                 else
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
                     children: [
                       for (final card in profile.parentCards)
-                        SizedBox(
-                          width: 84,
-                          child: Column(
-                            children: [
-                              PictogramRepository.image(card.toWord(), 72),
-                              const SizedBox(height: 4),
-                              Text(
-                                card.label,
-                                maxLines: 2,
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: BoardTheme.ink,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                        InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ParentCardFormScreen(editing: card),
+                            ),
+                          ),
+                          child: SizedBox(
+                            width: 84,
+                            child: Column(
+                              children: [
+                                PictogramRepository.image(card.toWord(), 72),
+                                const SizedBox(height: 4),
+                                Text(
+                                  card.label,
+                                  maxLines: 2,
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: BoardTheme.ink,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                     ],
                   ),
+                if (profile.parentCards.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    s.editCardHint,
+                    style: const TextStyle(
+                      color: BoardTheme.muted,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 10),
                 OutlinedButton.icon(
                   onPressed: () => Navigator.of(context).push(
@@ -215,7 +244,10 @@ class _BoardSettingsScreenState extends State<BoardSettingsScreen> {
           _Title(s.showHideSection),
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text(s.showHideHint, style: const TextStyle(color: BoardTheme.muted)),
+            child: Text(
+              s.showHideHint,
+              style: const TextStyle(color: BoardTheme.muted),
+            ),
           ),
           _Card(
             padding: EdgeInsets.zero,
@@ -340,7 +372,10 @@ class _PhaseRow extends StatelessWidget {
                   ),
                   Text(
                     body,
-                    style: const TextStyle(color: BoardTheme.muted, fontSize: 13),
+                    style: const TextStyle(
+                      color: BoardTheme.muted,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),

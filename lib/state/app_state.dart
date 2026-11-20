@@ -22,6 +22,14 @@ class ChildProfile {
   String equippedOutfitId;
   final Set<int> completedGameIndices;
 
+  /// День, к которому относятся пройденные задания («Путешествие дня»).
+  String? journeyDate;
+
+  /// Лимит игр в день, в минутах (0 — без лимита). Доски общения не касается.
+  int gameLimitMinutes;
+  String? playedDate;
+  int playedSeconds;
+
   // Доска общения
   BoardPhase boardPhase;
   bool adultHintEnabled;
@@ -48,6 +56,10 @@ class ChildProfile {
     Set<String>? ownedOutfitIds,
     this.equippedOutfitId = 'default',
     Set<int>? completedGameIndices,
+    this.journeyDate,
+    this.gameLimitMinutes = 0,
+    this.playedDate,
+    this.playedSeconds = 0,
     // Пока нет опроса этапа 3, новый профиль начинает с фазы IV.
     this.boardPhase = BoardPhase.iv,
     this.adultHintEnabled = true,
@@ -77,6 +89,10 @@ class ChildProfile {
     'ownedOutfitIds': ownedOutfitIds.toList(),
     'equippedOutfitId': equippedOutfitId,
     'completedGameIndices': completedGameIndices.toList(),
+    'journeyDate': journeyDate,
+    'gameLimitMinutes': gameLimitMinutes,
+    'playedDate': playedDate,
+    'playedSeconds': playedSeconds,
     'boardPhase': boardPhase.name,
     'adultHintEnabled': adultHintEnabled,
     'boardCardCount': boardCardCount,
@@ -104,6 +120,10 @@ class ChildProfile {
       ...(json['ownedOutfitIds'] as List? ?? []).cast<String>(),
     },
     equippedOutfitId: json['equippedOutfitId'] as String? ?? 'default',
+    journeyDate: json['journeyDate'] as String?,
+    gameLimitMinutes: json['gameLimitMinutes'] as int? ?? 0,
+    playedDate: json['playedDate'] as String?,
+    playedSeconds: json['playedSeconds'] as int? ?? 0,
     completedGameIndices: (json['completedGameIndices'] as List? ?? [])
         .cast<int>()
         .toSet(),
@@ -221,6 +241,10 @@ class AppState extends ChangeNotifier {
 
   void _changed() {
     notifyListeners();
+    _save();
+  }
+
+  void _save() {
     _prefs.setString(
       _storageKey,
       jsonEncode({
@@ -345,23 +369,70 @@ class AppState extends ChangeNotifier {
 
   int get stars => activeProfile?.stars ?? 0;
   String get equippedOutfitId => activeProfile?.equippedOutfitId ?? 'default';
-  int get completedGamesCount =>
-      activeProfile?.completedGameIndices.length ?? 0;
+  /// Часы приложения. В тестах подменяются, чтобы проверить смену дня.
+  static DateTime Function() clock = DateTime.now;
+
+  static String _today() {
+    final now = clock();
+    return '${now.year}-${now.month}-${now.day}';
+  }
+
+  /// Пройденные сегодня задания. Каждый день путешествие начинается заново.
+  Set<int> get _completedToday {
+    final profile = activeProfile;
+    if (profile == null || profile.journeyDate != _today()) return const {};
+    return profile.completedGameIndices;
+  }
+
+  int get completedGamesCount => _completedToday.length;
 
   bool isOwned(String id) =>
       activeProfile?.ownedOutfitIds.contains(id) ?? false;
-  bool isGameCompleted(int index) =>
-      activeProfile?.completedGameIndices.contains(index) ?? false;
+  bool isGameCompleted(int index) => _completedToday.contains(index);
 
   /// Отмечает задание пройденным. Звёзды даются только за первое
-  /// прохождение; возвращает true, если звёзды были начислены.
+  /// прохождение за день; возвращает true, если звёзды были начислены.
   bool completeGame(int index, int reward) {
     final profile = activeProfile;
     if (profile == null) return false;
+    final today = _today();
+    if (profile.journeyDate != today) {
+      profile.completedGameIndices.clear();
+      profile.journeyDate = today;
+    }
     if (!profile.completedGameIndices.add(index)) return false;
     profile.stars += reward;
     _changed();
     return true;
+  }
+
+  // Лимит игр
+
+  int get gameLimitMinutes => activeProfile?.gameLimitMinutes ?? 0;
+
+  int get playedSecondsToday {
+    final profile = activeProfile;
+    if (profile == null || profile.playedDate != _today()) return 0;
+    return profile.playedSeconds;
+  }
+
+  bool get isGameLimitReached =>
+      gameLimitMinutes > 0 && playedSecondsToday >= gameLimitMinutes * 60;
+
+  void setGameLimitMinutes(int minutes) =>
+      _updateBoard((p) => p.gameLimitMinutes = minutes);
+
+  /// Время в играх за сегодня. Без перерисовки экранов: только сохранение.
+  void addPlayTime(int seconds) {
+    final profile = activeProfile;
+    if (profile == null || seconds <= 0) return;
+    final today = _today();
+    if (profile.playedDate != today) {
+      profile.playedDate = today;
+      profile.playedSeconds = 0;
+    }
+    profile.playedSeconds += seconds;
+    _save();
   }
 
   bool purchase(String id, int price) {
@@ -463,6 +534,11 @@ class AppState extends ChangeNotifier {
 
   void addParentCard(ParentCard card) =>
       _updateBoard((p) => p.parentCards.add(card));
+
+  void updateParentCard(ParentCard card) => _updateBoard((p) {
+    final index = p.parentCards.indexWhere((c) => c.id == card.id);
+    if (index >= 0) p.parentCards[index] = card;
+  });
 
   // Опрос родителя (текущего профиля)
 

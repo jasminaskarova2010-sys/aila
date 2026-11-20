@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
 import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
+import '../state/app_state.dart';
+import 'game_audio.dart';
 import '../widgets/aila_hello.dart';
 import 'missing_photo_placeholder.dart';
 
@@ -206,7 +208,7 @@ class _AilaPraise extends StatelessWidget {
   }
 }
 
-class _FeedbackBar extends StatelessWidget {
+class _FeedbackBar extends StatefulWidget {
   /// Номер задания на экране: от него зависит, как Айла хвалит.
   final int index;
   final String title;
@@ -221,13 +223,32 @@ class _FeedbackBar extends StatelessWidget {
   });
 
   @override
+  State<_FeedbackBar> createState() => _FeedbackBarState();
+}
+
+class _FeedbackBarState extends State<_FeedbackBar> {
+  bool _celebrated = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_celebrated) return;
+    _celebrated = true;
+    final appState = AppStateScope.of(context);
+    GameAudio.instance.success(
+      sound: appState.soundEnabled,
+      vibration: appState.vibrationEnabled,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _AilaPraise(index: index),
+            _AilaPraise(index: widget.index),
             const SizedBox(width: 12),
             Expanded(
               child: Container(
@@ -240,7 +261,7 @@ class _FeedbackBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      widget.title,
                       style: const TextStyle(
                         color: Color(0xFF4C7A3A),
                         fontSize: 15,
@@ -249,7 +270,7 @@ class _FeedbackBar extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      body,
+                      widget.body,
                       style: const TextStyle(
                         color: Color(0xFF331A47),
                         fontSize: 13,
@@ -267,7 +288,7 @@ class _FeedbackBar extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(30),
-            onTap: onContinue,
+            onTap: widget.onContinue,
             child: Container(
               width: double.infinity,
               height: 56,

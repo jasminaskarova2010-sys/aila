@@ -72,8 +72,10 @@ class _JourneyTabState extends State<JourneyTab> {
   Widget build(BuildContext context) {
     final s = S.of(context);
     final appState = AppStateScope.of(context);
-    final stepCount = gameStepsFor(context).length;
-    final nodes = _nodePositions.take(stepCount).toList();
+    final steps = gameStepsFor(context);
+    final nodes = _nodePositions.take(steps.length).toList();
+    final done = [for (final step in steps) appState.isGameCompleted(step.id)];
+    final current = done.indexOf(false);
     return Scaffold(
       body: Stack(
         children: [
@@ -83,27 +85,23 @@ class _JourneyTabState extends State<JourneyTab> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    Color(0xFFFDF3E4),
-                    Color(0xFFFCE9D2),
-                  ],
+                  colors: [Colors.white, Color(0xFFFDF3E4), Color(0xFFFCE9D2)],
                   stops: [0.0, 0.55, 1.0],
                 ),
               ),
             ),
           ),
           Positioned.fill(
-            child: CustomPaint(
-              painter: JourneyConstellationPainter(),
-            ),
+            child: CustomPaint(painter: JourneyConstellationPainter()),
           ),
           SafeArea(
             child: Column(
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -151,7 +149,9 @@ class _JourneyTabState extends State<JourneyTab> {
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 16),
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
@@ -169,15 +169,18 @@ class _JourneyTabState extends State<JourneyTab> {
                               child: Text(
                                 s.journeySection,
                                 style: TextStyle(
-                                  color:
-                                      const Color(0xFF331A47).withOpacity(0.7),
+                                  color: const Color(
+                                    0xFF331A47,
+                                  ).withOpacity(0.7),
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                            Icon(Icons.reorder,
-                                color: const Color(0xFF331A47).withOpacity(0.6)),
+                            Icon(
+                              Icons.reorder,
+                              color: const Color(0xFF331A47).withOpacity(0.6),
+                            ),
                           ],
                         ),
                       ),
@@ -194,22 +197,32 @@ class _JourneyTabState extends State<JourneyTab> {
                           height: _pathHeight,
                           child: LayoutBuilder(
                             builder: (context, constraints) {
-                              final size =
-                                  Size(constraints.maxWidth, _pathHeight);
+                              final size = Size(
+                                constraints.maxWidth,
+                                _pathHeight,
+                              );
                               return Stack(
                                 clipBehavior: Clip.none,
                                 children: [
                                   Positioned.fill(
                                     child: CustomPaint(
                                       painter: _JourneyPathPainter(
-                                          nodes: nodes),
+                                        nodes: nodes,
+                                      ),
                                     ),
                                   ),
                                   for (var i = 0; i < nodes.length; i++)
-                                    _buildNode(context, size, i),
+                                    _buildNode(
+                                      context,
+                                      size,
+                                      i,
+                                      done: done[i],
+                                      current: i == current,
+                                    ),
                                   Positioned(
                                     right: 20,
-                                    top: _nodePositions[1].dy * _pathHeight - 30,
+                                    top:
+                                        _nodePositions[1].dy * _pathHeight - 30,
                                     child: const _AilaReadingBadge(),
                                   ),
                                 ],
@@ -237,7 +250,13 @@ class _JourneyTabState extends State<JourneyTab> {
     );
   }
 
-  Widget _buildNode(BuildContext context, Size size, int index) {
+  Widget _buildNode(
+    BuildContext context,
+    Size size,
+    int index, {
+    required bool done,
+    required bool current,
+  }) {
     final fraction = _nodePositions[index];
     final center = Offset(fraction.dx * size.width, fraction.dy * size.height);
 
@@ -245,8 +264,9 @@ class _JourneyTabState extends State<JourneyTab> {
       left: center.dx - 30,
       top: center.dy - 30,
       child: _JourneyNode(
-        icon: _iconFor(index),
-        current: index == 0,
+        icon: done ? Icons.check_rounded : _iconFor(index),
+        done: done,
+        current: current,
         onTap: () => _openGame(context, index),
       ),
     );
@@ -279,11 +299,13 @@ class _AilaReadingBadge extends StatelessWidget {
 
 class _JourneyNode extends StatelessWidget {
   final IconData icon;
+  final bool done;
   final bool current;
   final VoidCallback onTap;
 
   const _JourneyNode({
     required this.icon,
+    required this.done,
     required this.current,
     required this.onTap,
   });
@@ -300,15 +322,18 @@ class _JourneyNode extends StatelessWidget {
           height: 60,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: done ? const Color(0xFFEAF3DE) : Colors.white,
             shape: BoxShape.circle,
             border: current
                 ? Border.all(color: const Color(0xFFE0A93E), width: 3)
                 : null,
             boxShadow: [
               BoxShadow(
-                color: (current ? const Color(0xFFE0A93E) : const Color(0xFF331A47))
-                    .withOpacity(current ? 0.45 : 0.08),
+                color:
+                    (current
+                            ? const Color(0xFFE0A93E)
+                            : const Color(0xFF331A47))
+                        .withOpacity(current ? 0.45 : 0.08),
                 offset: const Offset(0, 4),
                 blurRadius: current ? 20 : 10,
               ),
@@ -316,7 +341,9 @@ class _JourneyNode extends StatelessWidget {
           ),
           child: Icon(
             icon,
-            color: current ? const Color(0xFFE0A93E) : const Color(0xFF7A6C99),
+            color: done
+                ? const Color(0xFF4C7A3A)
+                : (current ? const Color(0xFFE0A93E) : const Color(0xFF7A6C99)),
             size: 28,
           ),
         ),
@@ -451,15 +478,15 @@ class JourneyConstellationPainter extends CustomPainter {
   final List<Offset> _sparkles;
 
   JourneyConstellationPainter()
-      : _sparkles = [
-          const Offset(0.1, 0.06),
-          const Offset(0.85, 0.1),
-          const Offset(0.9, 0.35),
-          const Offset(0.08, 0.45),
-          const Offset(0.88, 0.6),
-          const Offset(0.12, 0.7),
-          const Offset(0.8, 0.85),
-        ];
+    : _sparkles = [
+        const Offset(0.1, 0.06),
+        const Offset(0.85, 0.1),
+        const Offset(0.9, 0.35),
+        const Offset(0.08, 0.45),
+        const Offset(0.88, 0.6),
+        const Offset(0.12, 0.7),
+        const Offset(0.8, 0.85),
+      ];
 
   @override
   void paint(Canvas canvas, Size size) {

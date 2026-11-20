@@ -82,6 +82,36 @@ JournalCounts countWeek(Iterable<JournalEntry> entries, DateTime now) {
   return _count(entries.where((e) => !e.time.isBefore(start)));
 }
 
+/// Сколько фраз сказано в каждый из последних [days] дней, от старого к сегодня.
+List<int> phrasesPerDay(Iterable<JournalEntry> entries, DateTime now, {int days = 7}) {
+  final today = DateTime(now.year, now.month, now.day);
+  final counts = List<int>.filled(days, 0);
+  for (final e in entries) {
+    if (e.isPhaseChange) continue;
+    final day = DateTime(e.time.year, e.time.month, e.time.day);
+    final ago = today.difference(day).inDays;
+    if (ago >= 0 && ago < days) counts[days - 1 - ago]++;
+  }
+  return counts;
+}
+
+/// Самые частые фразы с [since] по убыванию. Одинаковое число — по алфавиту,
+/// чтобы порядок не прыгал.
+List<MapEntry<String, int>> topPhrases(
+  Iterable<JournalEntry> entries,
+  DateTime since, {
+  int limit = 3,
+}) {
+  final counts = <String, int>{};
+  for (final e in entries) {
+    if (e.isPhaseChange || e.time.isBefore(since) || e.text.isEmpty) continue;
+    counts[e.text] = (counts[e.text] ?? 0) + 1;
+  }
+  final list = counts.entries.toList()
+    ..sort((a, b) => b.value != a.value ? b.value - a.value : a.key.compareTo(b.key));
+  return list.take(limit).toList();
+}
+
 String _two(int value) => value.toString().padLeft(2, '0');
 
 String _formatTime(DateTime t) =>

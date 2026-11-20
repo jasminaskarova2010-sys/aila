@@ -160,10 +160,10 @@ void main() {
     await tester.pumpAndSettle();
     final nav = tester.state<NavigatorState>(find.byType(Navigator));
 
-    // «Повтори фразу» в фазе IV (задание 9 из 10). Прохождение хранится по
+    // «Повтори фразу» в фазе IV (задание 8 из 9). Прохождение хранится по
     // постоянному номеру задания (6).
     nav.push(MaterialPageRoute(
-        builder: (_) => const GamesFlowScreen(startIndex: 8)));
+        builder: (_) => const GamesFlowScreen(startIndex: 7)));
     await tester.pumpAndSettle();
     expect(find.text('Тренировка вместе с родителем'), findsOneWidget);
     await tester.tap(find.text('Послушать'));
@@ -182,7 +182,7 @@ void main() {
     nav.pop();
     await tester.pumpAndSettle();
     nav.push(MaterialPageRoute(
-        builder: (_) => const GamesFlowScreen(startIndex: 8)));
+        builder: (_) => const GamesFlowScreen(startIndex: 7)));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Получилось'));
     await tester.pumpAndSettle();
@@ -204,12 +204,12 @@ void main() {
     await tester.pumpWidget(MyApp(appState: state));
     await tester.pumpAndSettle();
     final nav = tester.state<NavigatorState>(find.byType(Navigator));
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 9; i++) {
       nav.push(MaterialPageRoute(
           builder: (_) => GamesFlowScreen(startIndex: i)));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      expect(find.text('${i + 1} / 10'), findsOneWidget);
+      expect(find.text('${i + 1} / 9'), findsOneWidget);
       nav.pop();
       await tester.pumpAndSettle();
     }

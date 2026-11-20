@@ -10,7 +10,6 @@ import '../board/phrase_builder.dart';
 import '../board/pictogram_repository.dart';
 import '../l10n/strings.dart';
 import '../state/app_state.dart';
-import 'game_pictograms.dart';
 
 enum GameKind { choice, order, categorize, speak, findPicture, buildPhrase }
 
@@ -314,23 +313,6 @@ List<GameStep> buildGameSteps(S s, BoardModel model, {Random? random}) {
     successBody: s.gameStorySuccess,
   );
 
-  final look = GameStep(
-    id: 2,
-    title: s.gameLookTitle,
-    subtitle: s.gameLookSubtitle,
-    kind: GameKind.choice,
-    promptPlaceholderNote: s.gameLookPhotoNote,
-    promptCaption: s.gameLookCaption,
-    options: [
-      ChoiceOption(pictogramBuilder: (size) => PlanePictogram(size: size)),
-      ChoiceOption(pictogramBuilder: (size) => BalloonPictogram(size: size)),
-      ChoiceOption(pictogramBuilder: (size) => BirdPictogram(size: size)),
-    ],
-    correctIndex: 0,
-    successTitle: s.gameWellDone,
-    successBody: s.gameLookSuccess,
-  );
-
   List<OrderItemData> sequence() => [
     OrderItemData(
       imagePath: 'assets/games/daily-life/waking_up.PNG',
@@ -394,7 +376,6 @@ List<GameStep> buildGameSteps(S s, BoardModel model, {Random? random}) {
     ?_findPictureStep(s, model, rnd),
     happy,
     story,
-    look,
     order,
     ?_sortStep(s, model, rnd),
     ?_whatSaysStep(s, model, rnd),

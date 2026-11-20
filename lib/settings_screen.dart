@@ -201,6 +201,62 @@ class SettingsScreen extends StatelessWidget {
                     const _RowDivider(),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.timer_outlined,
+                                color: Color(0xFF331A47),
+                                size: 22,
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Text(
+                                  s.limitLabel,
+                                  style: const TextStyle(
+                                    color: Color(0xFF331A47),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              for (final minutes in const [0, 10, 15, 20, 30])
+                                ChoiceChip(
+                                  label: Text(minutes == 0
+                                      ? s.limitOff
+                                      : s.limitMinutes(minutes)),
+                                  selected:
+                                      appState.gameLimitMinutes == minutes,
+                                  onSelected: (_) =>
+                                      appState.setGameLimitMinutes(minutes),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            s.limitPlayedToday(
+                              (appState.playedSecondsToday / 60).floor(),
+                            ),
+                            style: const TextStyle(
+                              color: Color(0xFF6B5D82),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const _RowDivider(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Row(
                         children: [
                           const Icon(

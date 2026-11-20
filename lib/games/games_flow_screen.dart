@@ -1,5 +1,7 @@
 // lib/games/games_flow_screen.dart
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../board/board_speech.dart';
 import '../l10n/app_language.dart';
@@ -10,6 +12,7 @@ import 'build_phrase_screen.dart';
 import 'categorize_game_screen.dart';
 import 'choice_game_screen.dart';
 import 'find_picture_screen.dart';
+import 'game_audio.dart';
 import 'game_models.dart';
 import 'order_game_screen.dart';
 import 'speak_game_screen.dart';
@@ -33,14 +36,32 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
   String? _stepsKey;
   AppLanguage? _speechLanguage;
 
+  /// Время в играх считается для лимита родителя.
+  Timer? _playTimer;
+  DateTime _playSince = DateTime.now();
+  AppState? _appState;
+
   /// Заданий с прошлого перерыва.
   int _sinceBreak = 0;
   bool _onBreak = false;
+
+  /// Задание уже открыто: лимит не прерывает его на середине.
+  bool _inTask = false;
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.startIndex;
+    _playTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => _recordPlayTime(),
+    );
+  }
+
+  void _recordPlayTime() {
+    final now = DateTime.now();
+    _appState?.addPlayTime(now.difference(_playSince).inSeconds);
+    _playSince = now;
   }
 
   @override
@@ -51,7 +72,19 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
       _speechLanguage = language;
       _checkVoice(language);
     }
+    _appState = AppStateScope.of(context);
     _refreshSteps();
+    _syncMusic();
+  }
+
+  /// Музыка играет, пока открыты игры, и слушается переключателя в настройках.
+  void _syncMusic() {
+    final on = AppStateScope.of(context).musicEnabled;
+    if (on) {
+      GameAudio.instance.startMusic();
+    } else {
+      GameAudio.instance.stopMusic();
+    }
   }
 
   Future<void> _checkVoice(AppLanguage language) async {
@@ -84,6 +117,9 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
 
   @override
   void dispose() {
+    _playTimer?.cancel();
+    _recordPlayTime();
+    GameAudio.instance.stopMusic();
     _speech.dispose();
     super.dispose();
   }
@@ -125,6 +161,8 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
   }
 
   void _goNext() {
+    _recordPlayTime();
+    _inTask = false;
     if (_currentIndex + 1 >= _steps.length) {
       _finish();
       return;
@@ -151,7 +189,9 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
         title: Text(
           s.sessionDoneTitle,
           style: const TextStyle(
-              color: Color(0xFF331A47), fontWeight: FontWeight.bold),
+            color: Color(0xFF331A47),
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           s.sessionDoneBody(_earnedStars),
@@ -170,11 +210,16 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Лимит проверяется между заданиями: начатое задание не обрывается.
+    if (AppStateScope.of(context).isGameLimitReached && !_inTask) {
+      return const GameLimitScreen();
+    }
     if (_onBreak) {
       return BreakScreen(onContinue: () => setState(() => _onBreak = false));
     }
     final step = _steps[_currentIndex];
     final total = _steps.length;
+    _inTask = true;
     switch (step.kind) {
       case GameKind.findPicture:
         return FindPictureScreen(

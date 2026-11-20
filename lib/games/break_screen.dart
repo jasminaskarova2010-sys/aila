@@ -8,6 +8,60 @@ import '../board/pictogram_repository.dart';
 import '../l10n/strings.dart';
 import '../widgets/primary_button.dart';
 
+/// Игры на сегодня закончились (лимит родителя). Доска общения работает.
+class GameLimitScreen extends StatelessWidget {
+  const GameLimitScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    return Scaffold(
+      backgroundColor: BoardTheme.background,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset('assets/star_mascot.png', width: 160),
+                const SizedBox(height: 20),
+                Text(
+                  s.limitTitle,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: BoardTheme.ink,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  s.limitBody,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: BoardTheme.muted,
+                    fontSize: 16,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 360),
+                  child: PrimaryButton(
+                    label: s.limitHome,
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Спокойный перерыв между заданиями. Таймера нет: занятие продолжает взрослый,
 /// когда ребёнок готов.
 class BreakScreen extends StatelessWidget {

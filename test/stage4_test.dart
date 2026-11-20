@@ -6,7 +6,6 @@ import 'package:aila_app/board/board_model.dart';
 import 'package:aila_app/board/board_screen.dart';
 import 'package:aila_app/board/board_words.dart';
 import 'package:aila_app/games/game_models.dart';
-import 'package:aila_app/games/game_pictograms.dart';
 import 'package:aila_app/games/games_flow_screen.dart';
 import 'package:aila_app/journal/journal.dart';
 import 'package:aila_app/l10n/app_language.dart';
@@ -80,7 +79,7 @@ void main() {
         final steps = buildGameSteps(s, model);
         final hasPhrase = steps.any((st) => st.kind == GameKind.buildPhrase);
         expect(hasPhrase, phase.hasStrip, reason: '$phase');
-        expect(steps.length, phase.hasStrip ? 10 : 9);
+        expect(steps.length, phase.hasStrip ? 9 : 8);
         // Номера на экране идут подряд, постоянные номера не повторяются.
         expect(steps.map((st) => st.index), [
           for (var i = 1; i <= steps.length; i++) i,
@@ -155,7 +154,7 @@ void main() {
         BoardModel(state.activeProfile!),
       );
       // Остались задания на фото.
-      expect(steps.map((st) => st.id), [0, 1, 2, 3, 7]);
+      expect(steps.map((st) => st.id), [0, 1, 3, 7]);
     });
 
     test('прохождение хранится по постоянному номеру', () async {
@@ -170,7 +169,7 @@ void main() {
     final state = await newState();
     await openFlow(tester, state, 0);
     expect(find.text('Найди картинку'), findsOneWidget);
-    expect(find.text('1 / 10'), findsOneWidget);
+    expect(find.text('1 / 9'), findsOneWidget);
 
     for (var round = 0; round < 3; round++) {
       await tester.pump(const Duration(milliseconds: 300));
@@ -210,7 +209,7 @@ void main() {
     tester,
   ) async {
     final state = await newState();
-    await openFlow(tester, state, 7);
+    await openFlow(tester, state, 6);
     expect(find.text('Собери фразу'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 300));
     final phrase = spoken.last;
@@ -250,7 +249,8 @@ void main() {
 
   testWidgets('перерыв после заданного числа заданий', (tester) async {
     final state = await newState();
-    state.setBreakAfterTasks(3);
+    // В настройках 3–5; здесь 2, чтобы не проходить задание с перетаскиванием.
+    state.setBreakAfterTasks(2);
     await openFlow(tester, state, 1);
 
     Future<void> solve(Finder finder) async {
@@ -270,8 +270,6 @@ void main() {
     await solve(asset('assets/games/emotions/happy_child.PNG'));
     expect(find.text('Время перерыва'), findsNothing);
     await solve(asset('assets/games/social/waiting_in_line.PNG'));
-    expect(find.text('Время перерыва'), findsNothing);
-    await solve(find.byType(PlanePictogram));
     expect(find.text('Время перерыва'), findsOneWidget);
     expect(find.text('перерыв'), findsOneWidget);
 
@@ -281,7 +279,7 @@ void main() {
 
     await tester.tap(find.text('Продолжить'));
     await tester.pumpAndSettle();
-    expect(find.text('5 / 10'), findsOneWidget);
+    expect(find.text('4 / 9'), findsOneWidget);
   });
 
   testWidgets('казахский: тексты игр, озвучка, интерфейс', (tester) async {

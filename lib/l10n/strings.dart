@@ -162,9 +162,12 @@ class S {
       'Manage the app and make it more comfortable for you!',
       'Қолданбаны басқарып, өзіңе ыңғайлы ет!');
   String get sectionGeneral => _t('Общее', 'General', 'Жалпы');
-  String get sound => _t('Звук', 'Sound', 'Дыбыс');
-  String get music => _t('Музыка', 'Music', 'Музыка');
-  String get vibration => _t('Вибрация', 'Vibration', 'Дірілдеу');
+  String get sound =>
+      _t('Звук верного ответа', 'Correct answer sound', 'Дұрыс жауап дыбысы');
+  String get music =>
+      _t('Спокойная музыка в играх', 'Calm music in games', 'Ойындағы тыныш әуен');
+  String get vibration =>
+      _t('Лёгкая вибрация при верном ответе', 'Light vibration on a correct answer', 'Дұрыс жауапта жеңіл діріл');
   String get sectionProfiles =>
       _t('Профили детей', 'Child profiles', 'Балалар профильдері');
   String get addProfile => _t('Добавить профиль', 'Add profile', 'Профиль қосу');
@@ -729,4 +732,74 @@ class S {
         return _t('Обычная Айла', 'Classic Aila', 'Әдеттегі Айла');
     }
   }
+
+  // Лимит игр
+  String get limitLabel => _t('Лимит игр в день', 'Daily game limit', 'Күніне ойын шегі');
+  String get limitOff => _t('Без лимита', 'No limit', 'Шексіз');
+  String limitMinutes(int m) => _t('$m мин', '$m min', '$m мин');
+  String limitPlayedToday(int m) => _t(
+      'Сегодня в играх: $m мин. Доска общения работает всегда.',
+      'Played today: $m min. The communication board always works.',
+      'Бүгін ойында: $m мин. Қарым-қатынас тақтасы әрдайым жұмыс істейді.');
+  String get limitTitle =>
+      _t('На сегодня игры закончились', 'No more games today', 'Бүгінге ойын бітті');
+  String get limitBody => _t(
+      'Айла отдыхает. Завтра будут новые задания. Доска общения работает всегда.',
+      'Aila is resting. New tasks tomorrow. The communication board always works.',
+      'Айла демалып жатыр. Ертең жаңа тапсырмалар болады. Қарым-қатынас тақтасы әрдайым жұмыс істейді.');
+  String get limitHome => _t('На главную', 'Back home', 'Басты бетке');
+
+  // Экран «Сегодня»: график и частые фразы
+  String get todayChartTitle => _t('Фраз в день за 7 дней', 'Phrases per day, last 7 days', 'Соңғы 7 күндегі сөйлемдер');
+  String get todayTopPhrases => _t('Чаще всего говорит', 'Says most often', 'Жиі айтады');
+  String weekdayShort(int weekday) {
+    const ru = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    const en = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    const kk = ['Дс', 'Сс', 'Ср', 'Бс', 'Жм', 'Сн', 'Жс'];
+    return _t(ru[weekday - 1], en[weekday - 1], kk[weekday - 1]);
+  }
+
+  // Документ для специалиста
+  String get reportButton =>
+      _t('Собрать документ специалисту', 'Make a report for the specialist', 'Маманға құжат жинау');
+  String get reportTitle =>
+      _t('Отчёт для специалиста', 'Report for the specialist', 'Маманға арналған есеп');
+  String reportCreated(String date) =>
+      _t('Создан в приложении Айла $date', 'Created in the Aila app on $date', 'Айла қолданбасында жасалды: $date');
+  String get reportChild => _t('Ребёнок', 'Child', 'Бала');
+  String get reportName => _t('Имя (впишите сами)', 'Name (fill in yourself)', 'Аты (өзіңіз жазыңыз)');
+  String get reportLanguage => _t('Язык', 'Language', 'Тіл');
+  String get reportPhase => _t('Фаза доски общения', 'Communication board phase', 'Тақта кезеңі');
+  String get reportNoSurvey => _t('Опрос ещё не пройден.', 'The survey has not been taken yet.', 'Сауалнама әлі өтілмеген.');
+  String reportSurveyDate(String date) => _t('Пройден $date', 'Taken on $date', 'Өтілген күні: $date');
+  String get reportSurveyShort => _t(
+      'Опрос завершён досрочно: на вопрос 1 или 2 ответ был не «Почти всегда».',
+      'The survey ended early: question 1 or 2 was not answered "Almost always".',
+      'Сауалнама ерте аяқталды: 1 немесе 2-сұраққа «Әрдайым дерлік» деп жауап берілмеді.');
+  String get reportWeeks => _t('Фразы на доске за 4 недели', 'Board phrases, last 4 weeks', 'Соңғы 4 аптадағы сөйлемдер');
+  String get reportWeek => _t('Неделя', 'Week', 'Апта');
+  String get reportAll => _t('Всего фраз', 'All phrases', 'Барлық сөйлем');
+  String get reportAnswers => _t('ответов на вопрос', 'answers to a question', 'сұраққа жауап');
+  String get reportTopPhrases => _t('Частые фразы за 4 недели', 'Frequent phrases, last 4 weeks', '4 аптадағы жиі сөйлемдер');
+  String get reportPhaseChanges => _t('Смена фазы', 'Phase changes', 'Кезең ауысуы');
+  String get reportDisclaimer => _t(
+      'Данные собраны приложением Айла на устройстве семьи. Это не медицинский документ и не диагноз. Спонтанная фраза: ребёнок сказал сам, а не ответил на вопрос в течение 2 минут. «Я хочу» считается карточкой.',
+      'Data collected by the Aila app on the family\'s device. This is not a medical document or a diagnosis. A spontaneous phrase is one the child said on their own, not an answer to a question within 2 minutes. "I want" counts as a card.',
+      'Деректерді Айла қолданбасы отбасы құрылғысында жинады. Бұл медициналық құжат не диагноз емес. Өз бетінше сөйлем — бала 2 минут ішіндегі сұраққа жауап бермей, өзі айтқан сөйлем. «Мен қалаймын» карточка болып саналады.');
+  String languageName(AppLanguage language) {
+    switch (language) {
+      case AppLanguage.ru:
+        return 'Русский';
+      case AppLanguage.kk:
+        return 'Қазақша';
+      case AppLanguage.en:
+        return 'English';
+    }
+  }
+
+  String get editCard => _t('Изменить карточку', 'Edit card', 'Карточканы өзгерту');
+  String get editCardHint => _t(
+      'Нажмите на карточку, чтобы изменить фото, подпись или голос.',
+      'Tap a card to change its photo, label or voice.',
+      'Суретін, жазуын не дауысын өзгерту үшін карточканы басыңыз.');
 }

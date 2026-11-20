@@ -11,6 +11,7 @@ import '../journal/journal.dart';
 import '../l10n/strings.dart';
 import '../state/app_state.dart';
 import '../widgets/primary_button.dart';
+import 'specialist_report.dart';
 
 /// Экран «Сегодня»: сколько ребёнок говорил с помощью доски. Числа считаются по
 /// журналу на устройстве, отчётом родитель делится сам.
@@ -81,13 +82,32 @@ class TodayScreen extends StatelessWidget {
           const SizedBox(height: 16),
           _Period(title: s.todayWeek, counts: week),
           const SizedBox(height: 16),
+          _WeekChart(counts: phrasesPerDay(entries, now), now: now),
+          const SizedBox(height: 16),
+          _TopPhrases(
+            phrases: topPhrases(
+              entries,
+              DateTime(now.year, now.month, now.day - 6),
+            ),
+          ),
+          const SizedBox(height: 16),
           Text(
             s.todayExplanation,
-            style: const TextStyle(color: BoardTheme.muted, fontSize: 13, height: 1.4),
+            style: const TextStyle(
+              color: BoardTheme.muted,
+              fontSize: 13,
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 24),
           PrimaryButton(
+            label: s.reportButton,
+            onTap: () => shareSpecialistReport(context),
+          ),
+          const SizedBox(height: 12),
+          PrimaryButton(
             label: s.todayShare,
+            filled: false,
             onTap: entries.isEmpty ? null : () => _share(context, entries),
           ),
           if (entries.isEmpty) ...[
@@ -98,6 +118,153 @@ class TodayScreen extends StatelessWidget {
               style: const TextStyle(color: BoardTheme.muted, fontSize: 13),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Столбики: сколько фраз в каждый из 7 дней, сегодня тёмным.
+class _WeekChart extends StatelessWidget {
+  final List<int> counts;
+  final DateTime now;
+
+  const _WeekChart({required this.counts, required this.now});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final top = counts.fold<int>(0, (a, b) => a > b ? a : b);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            s.todayChartTitle,
+            style: const TextStyle(
+              color: BoardTheme.ink,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 130,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                for (var i = 0; i < counts.length; i++)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${counts[i]}',
+                            style: const TextStyle(
+                              color: BoardTheme.ink,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            height: top == 0 ? 4 : 4 + 80 * counts[i] / top,
+                            decoration: BoxDecoration(
+                              color: i == counts.length - 1
+                                  ? BoardTheme.ink
+                                  : const Color(0xFFCFC3EA),
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(6),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            s.weekdayShort(
+                              now
+                                  .subtract(
+                                    Duration(days: counts.length - 1 - i),
+                                  )
+                                  .weekday,
+                            ),
+                            style: const TextStyle(
+                              color: BoardTheme.muted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TopPhrases extends StatelessWidget {
+  final List<MapEntry<String, int>> phrases;
+
+  const _TopPhrases({required this.phrases});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    if (phrases.isEmpty) return const SizedBox.shrink();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            s.todayTopPhrases,
+            style: const TextStyle(
+              color: BoardTheme.ink,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final p in phrases)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF1E2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Text(
+                    '${p.key} · ${p.value}',
+                    style: const TextStyle(
+                      color: Color(0xFF6A3A00),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ],
       ),
     );

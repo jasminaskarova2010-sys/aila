@@ -35,7 +35,7 @@ flutter analyze lib/        # static analysis — run after every change, must b
 flutter run -d macos        # run on macOS desktop (primary dev target used in this repo)
 flutter devices             # list available run targets
 flutter build apk --release # тестовая сборка для Android: build/app/outputs/flutter-apk/app-release.apk
-flutter test                # widget/unit tests in test/, по файлу на этап (stage1_test.dart … stage5_test.dart)
+flutter test                # widget/unit tests in test/, по файлу на этап (stage1_test.dart … stage5_test.dart, extras_test.dart)
 ```
 
 There is no CI config. `flutter_tts` has no test implementation — tests that open screens using TTS mock the `flutter_tts` MethodChannel.
@@ -80,7 +80,7 @@ There is **no account/login, no Firebase, no network** (TZ П7, "Что НЕ в�
 
 `deleteProfile(id)` удаляет профиль и его журнал; файлы карточек родителя удаляет экран настроек через `ParentMedia.deleteFiles`. Если профилей не осталось, приложение возвращается к приветствию.
 
-Stars are honest: `completeGame(index, reward)` awards stars only on the **first** completion of a step and returns whether it did; replays are allowed but give nothing. `GamesFlowScreen` calls it with `kStarsPerGame` (50) and shows the "+50" snackbar only when stars were actually awarded.
+Stars are honest: `completeGame(index, reward)` awards stars only on the **first** completion of a step **за день** and returns whether it did; replays the same day give nothing. «Путешествие дня» начинается заново каждый день (`journeyDate`, часы `AppState.clock` подменяются в тестах). Лимит игр в день (`gameLimitMinutes`, 0 — без лимита) считает время в `GamesFlowScreen`; после лимита — `GameLimitScreen`, начатое задание не обрывается, доска общения не ограничивается. `GamesFlowScreen` calls it with `kStarsPerGame` (50) and shows the "+50" snackbar only when stars were actually awarded.
 
 ### Localization (`lib/l10n/`)
 
@@ -89,6 +89,8 @@ Hand-rolled, not `flutter gen-l10n`/ARB-based. `AppLanguage` enum (ru/en/kk) + `
 ### Games (`lib/games/`)
 
 `game_models.dart` defines `GameStep` (one config class for all kinds: `choice`, `order`, `categorize`, `speak`, `findPicture`, `buildPhrase`) and `buildGameSteps(S, BoardModel)` / `gameStepsFor(context)`: задания дня собираются под язык и профиль. Новых констант с текстами заданий не заводить: все тексты через `S`. `GameStep.id` — постоянный номер задания, по нему хранится прохождение (`completeGame(id)`), порядок и номер на экране (`index`) могут меняться. `GamesFlowScreen` идёт по заданиям, показывает перерыв (`BreakScreen`, таймера нет) после `breakAfterTasks` заданий (3–5, настройка родителя) и держит одну `BoardSpeech` на все экраны: озвучка на языке профиля, без голоса — сообщение родителю. Все экраны построены на общем `GameShell`. `journey_titles_sheet.dart` lets the user jump to any step via `GamesFlowScreen(startIndex: i)`, где `i` — позиция в списке для текущего профиля.
+
+**Звук в играх** (`game_audio.dart`): спокойная музыка, пока открыты игры, мягкий звук и лёгкая вибрация в момент верного ответа (панель «Молодец!» в `GameShell`). Каждое — своим переключателем в настройках. Звуки собраны скриптом `tool/make_sounds.py` (лицензий нет), в тестах `GameAudio.enabled = false` (`test/flutter_test_config.dart`). Айла хвалит по-разному по номеру задания (`_AilaPraise`). Задание «Куда смотрит Айла?» убрано по просьбе владелицы.
 
 **Игры на словах доски** (`findPicture`, `buildPhrase`, сортировка, «Что хочет сказать Айла?», «Повтори фразу») берут слова только из `BoardModel.gameObjects`/`visibleDescriptions`: скрытая родителем карточка или категория в них не появляется, а если карточек не хватает, задание пропускается. «Собери фразу» есть только с фазы IV. Задания на фото (эмоции, истории, последовательность, «Что делать?») и «Куда смотрит Айла?» учат ситуациям и остаются своим контентом.
 
@@ -110,7 +112,7 @@ Answer feedback in games is intentionally non-alarming: wrong answers get a neut
 - `pictogram_repository.dart` — единственное место, которое знает, откуда картинка. `kPictogramSet` переключает весь набор. Сейчас 53 слова из `assets/pecs_symbols/` (Mulberry), 7 из `assets/pictograms/arasaac/` (`i_feel`, `stop`, `bye`, `thanks`, `hurts`, `me`, `cartoon`). Для ARASAAC скачаны все 60 (`dart run tool/fetch_arasaac.dart`, список и ids в `manifest.json`), приложение в сеть не ходит (П8). Атрибуция обоих наборов на экране «О приложении» — не убирать.
 - `flutter_svg` не понимает `<style>` в SVG: такие файлы рисуются чёрными. При копировании нового символа из `assets/EN-symbols/` (~3400 Mulberry, в сборку не входит) перенесите цвета из `<style>` в атрибуты.
 - `board_speech.dart` — озвучка на языке профиля (`flutter_tts`, скорость 0.42). Запись голоса родителя важнее синтеза. Если голоса для языка нет, родитель видит сообщение.
-- `parent_media.dart` — папка с фото и записями карточек родителя. В профиле только имена файлов.
+- `parent_media.dart` — папка с фото и записями карточек родителя. В профиле только имена файлов. Карточку можно исправить: `ParentCardFormScreen(editing: card)` → `updateParentCard`.
 
 Слово «PECS» в интерфейсе не используется (П9). Папка `assets/pecs_symbols/` сохранила старое имя.
 
@@ -126,7 +128,7 @@ Answer feedback in games is intentionally non-alarming: wrong answers get a neut
 
 ### Журнал для пилота (`lib/journal/journal.dart`, `lib/parent/today_screen.dart`)
 
-Только на устройстве (П7): отдельный ключ `aila_journal_v1` в `shared_preferences`, последние 5000 записей, у каждого профиля свои. Фраза записывается по «Сказать», а в фазах III — по нажатию на карточку (`logPhrase`); смена фазы — в `setBoardPhase`. Ответом считается первая фраза в течение 2 минут после кнопки вопроса (`kAnswerWindow`). «Я хочу» считается карточкой. Экран «Сегодня» (настройки, за PIN) считает спонтанные фразы и фразы из 2+ карточек за день и за 7 дней. «Поделиться отчётом» — CSV через `share_plus`: разделитель `;`, метка UTF-8 для Excel, имени ребёнка нет.
+Только на устройстве (П7): отдельный ключ `aila_journal_v1` в `shared_preferences`, последние 5000 записей, у каждого профиля свои. Фраза записывается по «Сказать», а в фазах III — по нажатию на карточку (`logPhrase`); смена фазы — в `setBoardPhase`. Ответом считается первая фраза в течение 2 минут после кнопки вопроса (`kAnswerWindow`). «Я хочу» считается карточкой. Экран «Сегодня» (настройки, за PIN) считает спонтанные фразы и фразы из 2+ карточек за день и за 7 дней, рисует фразы по дням и частые фразы. «Собрать документ специалисту» — PDF за 4 недели (`specialist_report.dart`), имя ребёнка родитель вписывает сам. «Поделиться отчётом» — CSV через `share_plus`: разделитель `;`, метка UTF-8 для Excel, имени ребёнка нет.
 
 ### Wardrobe / rewards (`lib/wardrobe_screen.dart`, `lib/wardrobe/wardrobe_items.dart`)
 
