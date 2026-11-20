@@ -1,6 +1,7 @@
 // lib/wardrobe_screen.dart
 
 import 'package:flutter/material.dart';
+import 'l10n/strings.dart';
 import 'state/app_state.dart';
 import 'settings_screen.dart';
 import 'parent/pin_screens.dart';
@@ -18,6 +19,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final appState = AppStateScope.of(context);
     final pendingId = _pendingId ?? appState.equippedOutfitId;
     final pendingItem = findWardrobeItem(pendingId);
@@ -50,14 +52,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _CircleIconButton(
-                        icon: Icons.person,
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Профиль')),
-                          );
-                        },
-                      ),
+                      const SizedBox(width: 56),
                       Row(
                         children: [
                           _StatPill(
@@ -80,7 +75,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Настройки',
+                            s.settingsTitle,
                             style: TextStyle(
                               color: const Color(0xFF331A47).withOpacity(0.6),
                               fontSize: 11,
@@ -122,9 +117,9 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Гардероб Айлы',
-                                style: TextStyle(
+                              Text(
+                                s.wardrobeTitle,
+                                style: const TextStyle(
                                   color: Color(0xFF331A47),
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -132,7 +127,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Выбирай и наряжай Айлу!',
+                                s.wardrobeSubtitle,
                                 style: TextStyle(
                                   color: const Color(0xFF331A47).withOpacity(0.55),
                                   fontSize: 13,
@@ -213,7 +208,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           ),
                           icon: const Icon(Icons.refresh,
                               color: Color(0xFF331A47), size: 18),
-                          label: const Text('Сбросить',
+                          label: Text(s.wardrobeReset,
                               style: TextStyle(color: Color(0xFF331A47))),
                         ),
                       ),
@@ -223,7 +218,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           onPressed: () {
                             appState.equip(pendingId);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Наряд сохранён')),
+                              SnackBar(content: Text(s.wardrobeSaved)),
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -234,7 +229,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                             ),
                           ),
                           icon: const Icon(Icons.check, color: Colors.white, size: 18),
-                          label: const Text('Сохранить',
+                          label: Text(s.saveButton,
                               style: TextStyle(color: Colors.white)),
                         ),
                       ),
@@ -265,8 +260,8 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                             setState(() => _pendingId = item.id);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Недостаточно звёзд')),
+                              SnackBar(
+                                  content: Text(s.wardrobeNotEnoughStars)),
                             );
                           }
                         },
@@ -337,7 +332,7 @@ class _WardrobeCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    item.label,
+                    S.of(context).wardrobeItemName(item.id),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Color(0xFF331A47),
@@ -352,7 +347,7 @@ class _WardrobeCard extends StatelessWidget {
                       const Icon(Icons.star, color: Color(0xFFE0A93E), size: 14),
                       const SizedBox(width: 4),
                       Text(
-                        owned ? 'Есть' : '${item.price}',
+                        owned ? S.of(context).wardrobeOwned : '${item.price}',
                         style: const TextStyle(
                           color: Color(0xFF331A47),
                           fontSize: 13,

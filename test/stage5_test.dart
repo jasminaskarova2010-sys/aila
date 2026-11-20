@@ -8,6 +8,7 @@ import 'package:aila_app/journal/journal.dart';
 import 'package:aila_app/l10n/app_language.dart';
 import 'package:aila_app/main.dart';
 import 'package:aila_app/settings_screen.dart';
+import 'package:aila_app/wardrobe_screen.dart';
 import 'package:aila_app/state/app_state.dart';
 import 'package:aila_app/widgets/aila_hello.dart';
 import 'package:flutter/material.dart';
@@ -166,6 +167,27 @@ void main() {
       final center = (frame.height ~/ 2 * frame.width + frame.width ~/ 2) * 4;
       expect(pixels.getUint8(center + 3), greaterThan(250));
     });
+  });
+
+  testWidgets('гардероб на языке профиля, кнопки «Профиль» нет', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(900, 2000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final state = await AppState.load();
+    state.addProfile(name: 'Айла', age: 5, language: AppLanguage.kk);
+    state.setPin('1234');
+    await tester.pumpWidget(MyApp(appState: state));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.person), findsNothing);
+    tester
+        .state<NavigatorState>(find.byType(Navigator))
+        .push(MaterialPageRoute(builder: (_) => const WardrobeScreen()));
+    await tester.pumpAndSettle();
+    expect(find.text('Айланың киім шкафы'), findsOneWidget);
+    expect(find.text('Күлгін худи'), findsOneWidget);
+    expect(find.text('Гардероб Айлы'), findsNothing);
+    expect(find.byIcon(Icons.person), findsNothing);
   });
 }
 

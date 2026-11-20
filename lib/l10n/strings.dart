@@ -103,7 +103,6 @@ class S {
       _t('Доска общения', 'Communication board', 'Қарым-қатынас тақтасы');
   String get pecsSubtitle => _t('Общение с помощью картинок',
       'Communicate with pictures', 'Суреттер арқылы қарым-қатынас');
-  String get profileSnackbar => _t('Профиль', 'Profile', 'Профиль');
   String get startingJourneySnackbar =>
       _t('Начинаем путешествие', 'Starting the journey', 'Саяхат басталады');
   String get defaultUserName => _t('друг', 'friend', 'дос');
@@ -698,4 +697,36 @@ class S {
       "This child's stars, outfits, completed tasks, parent cards with photos and voice, and journal will be deleted. This cannot be undone.",
       'Осы баланың жұлдыздары, киімдері, орындалған тапсырмалары, суреті мен дауысы бар ата-ана карточкалары және журналы жойылады. Мұны қайтару мүмкін емес.');
   String get deleteButton => _t('Удалить', 'Delete', 'Жою');
+
+  // Гардероб
+  String get wardrobeTitle => _t('Гардероб Айлы', "Aila's wardrobe", 'Айланың киім шкафы');
+  String get wardrobeSubtitle =>
+      _t('Выбирай и наряжай Айлу!', 'Choose an outfit for Aila!', 'Айлаға киім таңда!');
+  String get wardrobeReset => _t('Сбросить', 'Reset', 'Тастау');
+  String get wardrobeSaved => _t('Наряд сохранён', 'Outfit saved', 'Киім сақталды');
+  String get wardrobeNotEnoughStars =>
+      _t('Недостаточно звёзд', 'Not enough stars', 'Жұлдыз жеткіліксіз');
+  String get wardrobeOwned => _t('Есть', 'Owned', 'Бар');
+  String wardrobeItemName(String id) {
+    switch (id) {
+      case 'hoodie_purple':
+        return _t('Фиолетовое худи', 'Purple hoodie', 'Күлгін худи');
+      case 'tshirt_white':
+        return _t('Белая футболка', 'White T-shirt', 'Ақ футболка');
+      case 'dress_pink':
+        return _t('Розовое платье', 'Pink dress', 'Қызғылт көйлек');
+      case 'dragon_green':
+        return _t('Костюм дракона', 'Dragon costume', 'Айдаһар костюмі');
+      case 'sweater_yellow':
+        return _t('Жёлтый свитер', 'Yellow sweater', 'Сары свитер');
+      case 'overalls_blue':
+        return _t('Синий комбинезон', 'Blue overalls', 'Көк комбинезон');
+      case 'sailor':
+        return _t('Матроска', 'Sailor suit', 'Матрос киімі');
+      case 'royal_cape':
+        return _t('Мантия с короной', 'Cape and crown', 'Тәж бен мантия');
+      default:
+        return _t('Обычная Айла', 'Classic Aila', 'Әдеттегі Айла');
+    }
+  }
 }

@@ -33,6 +33,7 @@ flutter:
   assets:
     - assets/star_mascot.png
     - assets/aila_hello.png
+    - assets/aila_wink.png
     - assets/IMG_7941.PNG
     - assets/IMG_7942.PNG
     - assets/IMG_7943.PNG

@@ -73,14 +73,7 @@ class HomeTab extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _CircleIconButton(
-                        icon: Icons.person,
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(s.profileSnackbar)),
-                          );
-                        },
-                      ),
+                      const SizedBox(width: 56),
                       GestureDetector(
                         onTap: () {
                           openParentArea(

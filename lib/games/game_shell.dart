@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
 import '../parent/pin_screens.dart';
 import '../settings_screen.dart';
+import '../widgets/aila_hello.dart';
 import 'missing_photo_placeholder.dart';
 
 class GameShell extends StatelessWidget {
@@ -42,11 +43,7 @@ class GameShell extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    Color(0xFFFDF3E4),
-                    Color(0xFFFCE9D2),
-                  ],
+                  colors: [Colors.white, Color(0xFFFDF3E4), Color(0xFFFCE9D2)],
                   stops: [0.0, 0.55, 1.0],
                 ),
               ),
@@ -102,7 +99,8 @@ class GameShell extends StatelessWidget {
                                   minHeight: 8,
                                   backgroundColor: const Color(0xFFE3DCEC),
                                   valueColor: const AlwaysStoppedAnimation(
-                                      Color(0xFF331A47)),
+                                    Color(0xFF331A47),
+                                  ),
                                 ),
                               ),
                             ),
@@ -161,6 +159,7 @@ class GameShell extends StatelessWidget {
                           key: const ValueKey('solved'),
                           padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
                           child: _FeedbackBar(
+                            index: index,
                             title: feedbackTitle,
                             body: feedbackBody,
                             onContinue: onContinue,
@@ -177,12 +176,45 @@ class GameShell extends StatelessWidget {
   }
 }
 
+/// Айла хвалит по-разному: машет и подмигивает, подмигивает, улыбается.
+/// Выбор зависит от номера задания, а не от случая: так предсказуемее (П4).
+class _AilaPraise extends StatelessWidget {
+  final int index;
+
+  const _AilaPraise({required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (index % 3) {
+      case 0:
+        return const AilaHello(size: 72);
+      case 1:
+        return Image.asset(
+          'assets/aila_wink.png',
+          width: 72,
+          height: 72,
+          fit: BoxFit.contain,
+        );
+      default:
+        return Image.asset(
+          'assets/star_mascot.png',
+          width: 72,
+          height: 72,
+          fit: BoxFit.contain,
+        );
+    }
+  }
+}
+
 class _FeedbackBar extends StatelessWidget {
+  /// Номер задания на экране: от него зависит, как Айла хвалит.
+  final int index;
   final String title;
   final String body;
   final VoidCallback onContinue;
 
   const _FeedbackBar({
+    required this.index,
     required this.title,
     required this.body,
     required this.onContinue,
@@ -195,7 +227,7 @@ class _FeedbackBar extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Image.asset('assets/star_mascot.png', width: 64, fit: BoxFit.contain),
+            _AilaPraise(index: index),
             const SizedBox(width: 12),
             Expanded(
               child: Container(
@@ -254,12 +286,14 @@ class _FeedbackBar extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(S.of(context).continueButton,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      )),
+                  Text(
+                    S.of(context).continueButton,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(width: 6),
                   const Icon(Icons.chevron_right, color: Colors.white),
                 ],
@@ -328,24 +362,34 @@ class GamePromptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasVisual =
-        imagePath != null || pictogramBuilder != null || placeholderNote != null;
+        imagePath != null ||
+        pictogramBuilder != null ||
+        placeholderNote != null;
     if (!hasVisual && speech == null) return const SizedBox.shrink();
     return Column(
       children: [
-        if (hasVisual) ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Container(
-            width: double.infinity,
-            height: imagePath != null ? 220 : 140,
-            alignment: Alignment.center,
-            color: const Color(0xFFF2EEF9),
-            child: imagePath != null
-                ? Image.asset(imagePath!, fit: BoxFit.cover, width: double.infinity)
-                : (pictogramBuilder != null
-                    ? pictogramBuilder!(84)
-                    : MissingPhotoPlaceholder(note: placeholderNote!, size: 120)),
+        if (hasVisual)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              width: double.infinity,
+              height: imagePath != null ? 220 : 140,
+              alignment: Alignment.center,
+              color: const Color(0xFFF2EEF9),
+              child: imagePath != null
+                  ? Image.asset(
+                      imagePath!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    )
+                  : (pictogramBuilder != null
+                        ? pictogramBuilder!(84)
+                        : MissingPhotoPlaceholder(
+                            note: placeholderNote!,
+                            size: 120,
+                          )),
+            ),
           ),
-        ),
         if (caption != null) ...[
           const SizedBox(height: 12),
           Text(
@@ -366,7 +410,10 @@ class GamePromptCard extends StatelessWidget {
               onTap: onPlaySpeech,
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
