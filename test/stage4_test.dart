@@ -271,7 +271,22 @@ void main() {
     expect(find.text('Время перерыва'), findsNothing);
     await solve(asset('assets/games/social/waiting_in_line.PNG'));
     expect(find.text('Время перерыва'), findsOneWidget);
-    expect(find.text('перерыв'), findsOneWidget);
+    expect(find.text('Выбери, что тебе нравится'), findsOneWidget);
+    // Всё на экране озвучено: сначала заголовок и просьба выбрать.
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(spoken.last, 'Время перерыва. Выбери, что тебе нравится');
+
+    // Вкусняшки: еда и напитки, награды пока нет.
+    expect(find.text('Покажи родителям: это твоя награда!'), findsNothing);
+    await tester.tap(find.text('яблоко').first);
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(spoken.last, 'яблоко. Покажи родителям: это твоя награда!');
+    expect(find.text('Покажи родителям: это твоя награда!'), findsOneWidget);
+    // Нажатие на сообщение повторяет озвучку.
+    spoken.clear();
+    await tester.tap(find.text('Покажи родителям: это твоя награда!'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(spoken.last, startsWith('яблоко.'));
 
     // Таймера нет: экран ждёт взрослого.
     await tester.pump(const Duration(minutes: 5));

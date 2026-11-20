@@ -786,4 +786,11 @@ class S {
       'Нажмите на карточку, чтобы изменить фото, подпись или голос.',
       'Tap a card to change its photo, label or voice.',
       'Суретін, жазуын не дауысын өзгерту үшін карточканы басыңыз.');
+
+  String get breakChoose => _t('Выбери, что тебе нравится', 'Choose what you like', 'Ұнайтынын таңда');
+  String get breakShowParent => _t(
+      'Покажи родителям: это твоя награда!',
+      'Show your parents: this is your reward!',
+      'Ата-анаңа көрсет: бұл сенің сыйлығың!');
+  String get breakRestOnly => _t('Давай отдохнём', "Let's rest", 'Демалайық');
 }

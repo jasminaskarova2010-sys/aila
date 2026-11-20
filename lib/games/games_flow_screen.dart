@@ -215,7 +215,10 @@ class _GamesFlowScreenState extends State<GamesFlowScreen> {
       return const GameLimitScreen();
     }
     if (_onBreak) {
-      return BreakScreen(onContinue: () => setState(() => _onBreak = false));
+      return BreakScreen(
+        speech: _speech,
+        onContinue: () => setState(() => _onBreak = false),
+      );
     }
     final step = _steps[_currentIndex];
     final total = _steps.length;
