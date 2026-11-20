@@ -60,3 +60,7 @@ flutter test                # автотесты
 
 Карточки взяты из наборов Mulberry Symbols (CC BY-SA 4.0) и ARASAAC (CC BY-NC-SA, только некоммерческое использование).
 Список всех сторонних материалов и их лицензий: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Лицензия
+
+Код открыт только для просмотра, все права защищены: [LICENSE](LICENSE).
