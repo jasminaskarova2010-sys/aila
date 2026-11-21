@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
@@ -190,14 +191,21 @@ Future<void> shareSpecialistReport(BuildContext context) async {
       appState.journalEntries,
       now,
     );
-    final directory = await getTemporaryDirectory();
-    final file = File(
-      '${directory.path}/aila_specialist_${now.toIso8601String().substring(0, 10)}.pdf',
-    );
-    await file.writeAsBytes(bytes);
+    final name =
+        'aila_specialist_${now.toIso8601String().substring(0, 10)}.pdf';
+    final XFile shared;
+    if (kIsWeb) {
+      // В браузере нет папок: файл отдаётся из памяти.
+      shared = XFile.fromData(bytes, name: name, mimeType: 'application/pdf');
+    } else {
+      final directory = await getTemporaryDirectory();
+      final file = File('${directory.path}/$name');
+      await file.writeAsBytes(bytes);
+      shared = XFile(file.path, mimeType: 'application/pdf');
+    }
     await SharePlus.instance.share(
       ShareParams(
-        files: [XFile(file.path, mimeType: 'application/pdf')],
+        files: [shared],
         subject: s.reportTitle,
         sharePositionOrigin: box == null
             ? null

@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../l10n/app_language.dart';
@@ -43,6 +44,7 @@ class BoardSpeech {
     var available = true;
     try {
       await _tts.awaitSpeakCompletion(true);
+      if (kIsWeb) await _waitForWebVoices();
       final result = await _tts.isLanguageAvailable(locale);
       final set = await _tts.setLanguage(locale);
       // На Android при самом первом запуске движок мог отвечать «нет голоса»,
@@ -63,7 +65,19 @@ class BoardSpeech {
     await _tts.stop();
     await _player?.stop();
     await (_ready ??= _configure(_language));
+    // В браузере голоса могут догрузиться позже настройки: язык ставится
+    // перед каждой фразой, иначе текст прочитает голос по умолчанию.
+    if (kIsWeb) await _tts.setLanguage(_ttsLocales[_language]!);
     return generation;
+  }
+
+  /// Браузер отдаёт список голосов не сразу после загрузки страницы.
+  Future<void> _waitForWebVoices() async {
+    for (var i = 0; i < 30; i++) {
+      final voices = await _tts.getVoices;
+      if (voices is List && voices.isNotEmpty) return;
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
   }
 
   Future<void> speakText(String text) async {

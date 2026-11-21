@@ -1,6 +1,9 @@
 // lib/parent/today_screen.dart
 
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -33,12 +36,23 @@ class TodayScreen extends StatelessWidget {
       );
       final now = DateTime.now();
       final date = now.toIso8601String().substring(0, 10);
-      final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/aila_report_$date.csv');
-      await file.writeAsString(csv);
+      final XFile shared;
+      if (kIsWeb) {
+        // В браузере нет папок: файл отдаётся из памяти.
+        shared = XFile.fromData(
+          utf8.encode(csv),
+          name: 'aila_report_$date.csv',
+          mimeType: 'text/csv',
+        );
+      } else {
+        final directory = await getTemporaryDirectory();
+        final file = File('${directory.path}/aila_report_$date.csv');
+        await file.writeAsString(csv);
+        shared = XFile(file.path, mimeType: 'text/csv');
+      }
       await SharePlus.instance.share(
         ShareParams(
-          files: [XFile(file.path, mimeType: 'text/csv')],
+          files: [shared],
           subject: s.todayShare,
           // На iPad меню «Поделиться» привязывается к месту на экране.
           sharePositionOrigin: box == null
