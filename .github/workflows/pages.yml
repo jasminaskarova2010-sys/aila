@@ -30,6 +30,14 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build web --release --base-href /aila/ --no-wasm-dry-run
+      # Метка версии в ссылках на файлы приложения: после обновления телефон
+      # сразу берёт новую версию, а не старую копию из памяти браузера.
+      - run: |
+          V="${GITHUB_SHA::8}"
+          sed -i "s/\"main.dart.js\"/\"main.dart.js?v=$V\"/g" build/web/flutter_bootstrap.js
+          sed -i "s/flutter_bootstrap.js\"/flutter_bootstrap.js?v=$V\"/" build/web/index.html
+          grep -c "main.dart.js?v=$V" build/web/flutter_bootstrap.js
+          grep -c "flutter_bootstrap.js?v=$V" build/web/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
