@@ -86,12 +86,12 @@ class PictogramRepository {
 
   static Widget image(BoardWord word, double size) {
     if (word.imageFile != null) {
-      final file = ParentMedia.file(word.imageFile);
-      if (file == null) return _missing(size);
+      final picture = ParentMedia.image(word.imageFile);
+      if (picture == null) return _missing(size);
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.file(
-          file,
+        child: Image(
+          image: picture,
           width: size,
           height: size,
           fit: BoxFit.cover,

@@ -458,10 +458,10 @@ class S {
     'Бала өміріндегі заттар мен адамдардың суретін қосыңыз.',
   );
   String get addCard => _t('Добавить карточку', 'Add a card', 'Карточка қосу');
-  String get parentCardsOnDeviceOnly => _t(
-    'Свои карточки с фото и голосом можно добавить в приложении на телефоне или планшете. В браузере они не сохраняются.',
-    'Your own cards with a photo and voice can be added in the app on a phone or tablet. They are not saved in the browser.',
-    'Фотосы мен дауысы бар өз карточкаларыңызды телефондағы немесе планшеттегі қосымшада қосуға болады. Браузерде олар сақталмайды.',
+  String get parentMediaNoSpace => _t(
+    'Не хватает места в памяти браузера. Удалите ненужные карточки или установите приложение.',
+    'Not enough browser storage. Delete cards you do not need or install the app.',
+    'Браузер жадында орын жетпейді. Қажетсіз карточкаларды өшіріңіз немесе қосымшаны орнатыңыз.',
   );
   String get showHideSection =>
       _t('Показать или скрыть', 'Show or hide', 'Көрсету немесе жасыру');

@@ -1,7 +1,5 @@
 // lib/parent/parent_card_form_screen.dart
 
-import 'dart:io';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +48,7 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
   late BoardCategory _category = widget.editing?.category ?? BoardCategory.toys;
   bool _recording = false;
   bool _noMic = false;
+  String _webAudioName = '';
 
   @override
   void dispose() {
@@ -62,26 +61,72 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
   Future<void> _pickImage(ImageSource source) async {
     final picked = await _picker.pickImage(
       source: source,
-      maxWidth: 1000,
-      maxHeight: 1000,
-      imageQuality: 85,
+      // В браузере память маленькая: фото храним поменьше.
+      maxWidth: kIsWeb ? 600 : 1000,
+      maxHeight: kIsWeb ? 600 : 1000,
+      imageQuality: kIsWeb ? 75 : 85,
     );
     if (picked == null) return;
     final name = '${_cardId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    final target = ParentMedia.file(name);
-    if (target == null) return;
-    await File(picked.path).copy(target.path);
-    if (mounted) setState(() => _imageFile = name);
+    final saved = await ParentMedia.save(name, await picked.readAsBytes());
+    if (!mounted) return;
+    if (!saved) {
+      _showNoSpace();
+      return;
+    }
+    setState(() => _imageFile = name);
+  }
+
+  void _showNoSpace() {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(S.of(context).parentMediaNoSpace)));
+  }
+
+  /// Формат записи в браузере: Chrome и Android пишут webm, Safari и iPhone — mp4.
+  Future<AudioEncoder> _webEncoder() async {
+    if (await _recorder.isEncoderSupported(AudioEncoder.opus)) {
+      return AudioEncoder.opus;
+    }
+    return AudioEncoder.aacLc;
   }
 
   Future<void> _toggleRecording() async {
     if (_recording) {
-      await _recorder.stop();
+      final result = await _recorder.stop();
+      if (kIsWeb && result != null) {
+        // В браузере запись приходит ссылкой на данные в памяти.
+        final name = _webAudioName;
+        final saved = await ParentMedia.save(
+          name,
+          await XFile(result).readAsBytes(),
+        );
+        if (!mounted) return;
+        if (!saved) _showNoSpace();
+        setState(() {
+          _recording = false;
+          if (saved) _audioFile = name;
+        });
+        return;
+      }
       if (mounted) setState(() => _recording = false);
       return;
     }
     if (!await _recorder.hasPermission()) {
       if (mounted) setState(() => _noMic = true);
+      return;
+    }
+    if (kIsWeb) {
+      final encoder = await _webEncoder();
+      _webAudioName =
+          '$_cardId${encoder == AudioEncoder.opus ? '.webm' : '.m4a'}';
+      await _recorder.start(RecordConfig(encoder: encoder), path: '');
+      if (mounted) {
+        setState(() {
+          _noMic = false;
+          _recording = true;
+        });
+      }
       return;
     }
     final name = '$_cardId.m4a';
@@ -98,11 +143,11 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
   }
 
   Future<void> _playRecording() async {
-    final file = ParentMedia.file(_audioFile);
-    if (file == null) return;
+    final source = ParentMedia.audio(_audioFile);
+    if (source == null) return;
     final player = _player ??= AudioPlayer();
     await player.stop();
-    await player.play(DeviceFileSource(file.path));
+    await player.play(source);
   }
 
   Future<void> _save() async {
@@ -147,154 +192,140 @@ class _ParentCardFormScreenState extends State<ParentCardFormScreen> {
           ),
         ),
       ),
-      body: kIsWeb
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(28),
-                child: Text(
-                  s.parentCardsOnDeviceOnly,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: BoardTheme.ink, fontSize: 17),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+        children: [
+          _heading(s.cardPhoto),
+          if (_imageFile != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image(
+                    image: ParentMedia.image(_imageFile)!,
+                    width: 160,
+                    height: 160,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            )
-          : ListView(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
-              children: [
-                _heading(s.cardPhoto),
-                if (_imageFile != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.file(
-                          ParentMedia.file(_imageFile)!,
-                          width: 160,
-                          height: 160,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+            ),
+          Row(
+            children: [
+              if (_picker.supportsImageSource(ImageSource.camera)) ...[
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _pickImage(ImageSource.camera),
+                    icon: const Icon(
+                      Icons.photo_camera_outlined,
+                      color: BoardTheme.ink,
                     ),
-                  ),
-                Row(
-                  children: [
-                    if (_picker.supportsImageSource(ImageSource.camera)) ...[
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: const Icon(
-                            Icons.photo_camera_outlined,
-                            color: BoardTheme.ink,
-                          ),
-                          label: Text(
-                            s.cardFromCamera,
-                            style: const TextStyle(color: BoardTheme.ink),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _pickImage(ImageSource.gallery),
-                        icon: const Icon(
-                          Icons.photo_library_outlined,
-                          color: BoardTheme.ink,
-                        ),
-                        label: Text(
-                          s.cardFromGallery,
-                          style: const TextStyle(color: BoardTheme.ink),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                _heading(s.cardLabel),
-                TextField(
-                  controller: _label,
-                  onChanged: (_) => setState(() {}),
-                  decoration: InputDecoration(
-                    hintText: s.cardLabelHint,
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
+                    label: Text(
+                      s.cardFromCamera,
+                      style: const TextStyle(color: BoardTheme.ink),
                     ),
                   ),
                 ),
-                _heading(s.cardCategory),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    for (final category in _categories)
-                      ChoiceChip(
-                        label: Text(s.boardCategoryName(category)),
-                        selected: category == _category,
-                        onSelected: (_) => setState(() => _category = category),
-                      ),
-                  ],
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _pickImage(ImageSource.gallery),
+                  icon: const Icon(
+                    Icons.photo_library_outlined,
+                    color: BoardTheme.ink,
+                  ),
+                  label: Text(
+                    s.cardFromGallery,
+                    style: const TextStyle(color: BoardTheme.ink),
+                  ),
                 ),
-                _heading(s.cardVoice),
-                Text(
-                  s.cardVoiceHint,
-                  style: const TextStyle(color: BoardTheme.muted),
+              ),
+            ],
+          ),
+          _heading(s.cardLabel),
+          TextField(
+            controller: _label,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              hintText: s.cardLabelHint,
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          _heading(s.cardCategory),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final category in _categories)
+                ChoiceChip(
+                  label: Text(s.boardCategoryName(category)),
+                  selected: category == _category,
+                  onSelected: (_) => setState(() => _category = category),
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _toggleRecording,
-                        icon: Icon(
-                          _recording ? Icons.stop : Icons.mic_none,
-                          color: BoardTheme.ink,
-                        ),
-                        label: Text(
-                          _recording
-                              ? s.cardStopRecord
-                              : (_audioFile == null
-                                    ? s.cardRecord
-                                    : s.cardRecordAgain),
-                          style: const TextStyle(color: BoardTheme.ink),
-                        ),
-                      ),
+            ],
+          ),
+          _heading(s.cardVoice),
+          Text(
+            s.cardVoiceHint,
+            style: const TextStyle(color: BoardTheme.muted),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _toggleRecording,
+                  icon: Icon(
+                    _recording ? Icons.stop : Icons.mic_none,
+                    color: BoardTheme.ink,
+                  ),
+                  label: Text(
+                    _recording
+                        ? s.cardStopRecord
+                        : (_audioFile == null
+                              ? s.cardRecord
+                              : s.cardRecordAgain),
+                    style: const TextStyle(color: BoardTheme.ink),
+                  ),
+                ),
+              ),
+              if (_audioFile != null && !_recording) ...[
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _playRecording,
+                    icon: const Icon(
+                      Icons.volume_up_outlined,
+                      color: BoardTheme.ink,
                     ),
-                    if (_audioFile != null && !_recording) ...[
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _playRecording,
-                          icon: const Icon(
-                            Icons.volume_up_outlined,
-                            color: BoardTheme.ink,
-                          ),
-                          label: Text(
-                            s.cardPlay,
-                            style: const TextStyle(color: BoardTheme.ink),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                if (_noMic)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      s.cardNoMic,
-                      style: const TextStyle(color: BoardTheme.muted),
+                    label: Text(
+                      s.cardPlay,
+                      style: const TextStyle(color: BoardTheme.ink),
                     ),
                   ),
-                const SizedBox(height: 28),
-                PrimaryButton(
-                  label: s.saveButton,
-                  onTap: canSave ? _save : null,
                 ),
               ],
+            ],
+          ),
+          if (_noMic)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                s.cardNoMic,
+                style: const TextStyle(color: BoardTheme.muted),
+              ),
             ),
+          const SizedBox(height: 28),
+          PrimaryButton(label: s.saveButton, onTap: canSave ? _save : null),
+        ],
+      ),
     );
   }
 

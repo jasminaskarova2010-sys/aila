@@ -120,11 +120,11 @@ class BoardSpeech {
   }
 
   Future<bool> _playRecording(BoardWord word, int generation) async {
-    final file = ParentMedia.file(word.audioFile);
-    if (file == null || !file.existsSync()) return false;
+    final source = ParentMedia.audio(word.audioFile);
+    if (source == null) return false;
     final player = _player ??= AudioPlayer();
     final done = player.onPlayerComplete.first;
-    await player.play(DeviceFileSource(file.path));
+    await player.play(source);
     await done.timeout(const Duration(seconds: 30), onTimeout: () {});
     return generation == _generation;
   }
